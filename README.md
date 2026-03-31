@@ -1,18 +1,18 @@
-# ALPIS ImpactPath
+# BASKET VS A
 
-A mission-driven front-end platform concept built as part of a personal portfolio, designed to present progress, structure, and impact in a modern digital experience.
+A browser-based basketball game built as part of a personal front-end portfolio, focused on arcade gameplay, dynamic interaction, and a modern visual style.
 
 ## Live Demo
 
-https://laurandreea10.github.io/ALPIS-ImpactPath/
+https://laurandreea10.github.io/BASKET-VS-AI/
 
 ## Features
 
-* Mission-based platform structure
-* Progress-oriented interface
-* Clear and organized content flow
-* Modern front-end design
-* Responsive layout
+* Basketball-inspired arcade gameplay
+* Interactive browser experience
+* Fast-paced game flow
+* Modern visual presentation
+* Responsive front-end structure
 * GitHub Pages deployment
 
 ## Technologies
@@ -24,7 +24,7 @@ https://laurandreea10.github.io/ALPIS-ImpactPath/
 
 ## Purpose
 
-This project was created as a personal front-end experiment exploring how a digital platform can communicate direction, impact, and progress through a clean and interactive interface.
+This project was created as a personal front-end experiment exploring arcade mechanics, player interaction, and sports-inspired gameplay in a web-based format.
 
 ## Author
 
