@@ -1,1 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0a0f">
+<title>🏀 Basket vs AI — Career 3.0</title>
+<style>
+:root {
+  --bg:#0a0a0f; --bg2:#12121a; --bg3:#1a1a26;
+  --accent:#ff6b2b; --accent2:#ffb347; --gold:#ffd700;
+  --green:#22c55e; --blue:#3b82f6;
+  --text:#f0f0f0; --text2:#888; --text3:#555;
+  --border:rgba(255,255,255,0.08); --radius:12px;
+  --fd:'Bebas Neue',sans-serif; --fb:'DM Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--fb)}
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;overflow:hidden}
+.screen.active{opacity:1;pointer-events:all}
+/* LANG TOGGLE */
+#lang-btn{position:fixed;top:10px;right:12px;z-index:300;background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:700;cursor:pointer;font-family:var(--fb);letter-spacing:1px;transition:all .2s}
+#lang-btn:hover{border-color:var(--accent);color:var(--accent)}
+/* ONBOARD */
+#screen-onboard{background:var(--bg)}
+.ob-wrap{width:100%;max-width:420px;padding:2rem}
+.ob-step{display:none;text-align:center;animation:fadeUp .4s ease}
+.ob-step.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.ob-icon{font-size:3.5rem;margin-bottom:.75rem;display:block}
+.ob-title{font-family:var(--fd);font-size:2.6rem;color:var(--accent);letter-spacing:2px;margin-bottom:.4rem}
+.ob-sub{font-size:.95rem;color:var(--text2);line-height:1.6;margin-bottom:1.5rem}
+.ob-dots{display:flex;gap:8px;justify-content:center;margin-bottom:1.5rem}
+.ob-dot{width:8px;height:8px;border-radius:50%;background:var(--border);border:1px solid var(--text3);transition:all .3s}
+.ob-dot.active{background:var(--accent);border-color:var(--accent);width:24px;border-radius:4px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:.7rem 1.8rem;border-radius:50px;font-family:var(--fb);font-weight:700;font-size:.9rem;cursor:pointer;border:none;transition:all .2s}
+.btn-p{background:var(--accent);color:#fff}
+.btn-p:hover{background:#ff8050;transform:scale(1.03)}
+.btn-s{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-s:hover{border-color:var(--text3);color:var(--text)}
+/* MENU */
+#screen-menu{background:var(--bg)}
+.menu-wrap{width:100%;max-width:420px;padding:2rem}
+.menu-logo{font-family:var(--fd);font-size:3.2rem;color:var(--accent);letter-spacing:3px;text-align:center;margin-bottom:.2rem}
+.menu-sub{text-align:center;font-size:.75rem;color:var(--text2);letter-spacing:3px;text-transform:uppercase;margin-bottom:1.5rem}
+.player-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:.9rem 1.1rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:12px}
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.player-info{flex:1}
+.player-name{font-weight:700;font-size:.95rem}
+.player-meta{font-size:.75rem;color:var(--text2)}
+.xp-bar{height:4px;background:var(--bg);border-radius:2px;margin-top:5px;overflow:hidden}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .5s ease}
+.menu-actions{display:flex;flex-direction:column;gap:9px}
+.mbtn{width:100%;padding:.85rem 1.4rem;border-radius:var(--radius);font-family:var(--fb);font-size:.95rem;font-weight:600;cursor:pointer;border:none;display:flex;align-items:center;gap:10px;transition:all .2s}
+.mbtn-main{background:var(--accent);color:#fff;font-size:1.05rem}
+.mbtn-main:hover{background:#ff8050}
+.mbtn-sec{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
+.mbtn-sec:hover{border-color:var(--accent);color:var(--accent)}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .3s;padding:1rem}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:1.4rem;width:100%;max-width:360px;max-height:90vh;overflow-y:auto}
+.modal-title{font-family:var(--fd);font-size:1.7rem;color:var(--accent);letter-spacing:1px;margin-bottom:1.3rem}
+.srow{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;flex-wrap:wrap;gap:6px}
+.slabel{font-size:.85rem;color:var(--text2);min-width:80px}
+.pill-group{display:flex;gap:3px;flex-wrap:wrap}
+.pill{padding:4px 10px;border-radius:20px;font-size:.75rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text2);transition:all .15s}
+.pill.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.modal-close{width:100%;margin-top:.8rem;padding:.7rem;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:var(--radius);font-size:.9rem;cursor:pointer;font-family:var(--fb)}
+.modal-close:hover{color:var(--text)}
+/* GAME */
+#screen-game{background:var(--bg);justify-content:flex-start}
+.game-hud{width:100%;max-width:480px;display:flex;align-items:center;justify-content:space-between;padding:.65rem 1rem;flex-shrink:0}
+.hud-score{text-align:center}
+.hud-sv{font-family:var(--fd);font-size:2.2rem;color:var(--text);letter-spacing:1px;line-height:1}
+.hud-sl{font-size:.65rem;color:var(--text2);text-transform:uppercase;letter-spacing:1px}
+.hud-tv{font-family:var(--fd);font-size:1.7rem;color:var(--accent2);letter-spacing:1px}
+.hud-tl{font-size:.6rem;color:var(--text3);text-transform:uppercase}
+.combo-badge{background:var(--accent);color:#fff;padding:2px 8px;border-radius:20px;font-size:.75rem;font-weight:700;transition:all .3s;min-width:54px;text-align:center}
+.combo-badge.hidden{opacity:0}
+.gcw{flex:1;width:100%;max-width:480px;position:relative;display:flex;align-items:center;justify-content:center;min-height:0}
+#gameCanvas{width:100%;height:100%;touch-action:none}
+.game-controls{width:100%;max-width:480px;padding:.4rem 1rem .65rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.shoot-btn{width:68px;height:68px;border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:.75rem;font-weight:700;cursor:pointer;letter-spacing:1px;font-family:var(--fb);transition:all .15s;box-shadow:0 0 18px rgba(255,107,43,.4);position:relative;overflow:hidden}
+.shoot-btn::after{content:'';position:absolute;inset:0;background:#fff;opacity:0;border-radius:50%;transition:opacity .1s}
+.shoot-btn:active::after{opacity:.2}
+.power-bar{width:11px;height:75px;background:var(--bg3);border-radius:6px;overflow:hidden;position:relative;border:1px solid var(--border)}
+.power-fill{position:absolute;bottom:0;width:100%;border-radius:4px;transition:background .1s}
+.aim-bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 .9rem}
+.aim-indicator{width:100%;height:8px;background:var(--bg3);border-radius:4px;border:1px solid var(--border);position:relative;overflow:visible}
+.aim-cursor{position:absolute;top:50%;transform:translate(-50%,-50%);width:13px;height:13px;border-radius:50%;background:var(--accent);transition:left .05s;box-shadow:0 0 7px var(--accent)}
+.aim-label{font-size:.65rem;color:var(--text3)}
+.ctrl-btns{display:flex;gap:7px}
+.ctrl-btn{width:38px;height:38px;border-radius:9px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.ctrl-btn:hover{border-color:var(--text2);color:var(--text)}
+.float-text{position:absolute;font-family:var(--fd);font-size:1.3rem;letter-spacing:2px;pointer-events:none;animation:floatUp 1s ease forwards}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-55px) scale(1.3)}}
+/* GAMEOVER */
+#screen-gameover{background:rgba(10,10,15,.97)}
+.go-wrap{width:100%;max-width:400px;padding:1.8rem;text-align:center}
+.go-title{font-family:var(--fd);font-size:3.2rem;color:var(--accent);letter-spacing:4px}
+.go-score{font-family:var(--fd);font-size:4.5rem;color:var(--text);line-height:1;margin:.4rem 0}
+.go-label{font-size:.75rem;color:var(--text2);text-transform:uppercase;letter-spacing:2px;margin-bottom:1.2rem}
+.go-stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:1.2rem}
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:.65rem}
+.stat-val{font-family:var(--fd);font-size:1.7rem;color:var(--accent2)}
+.stat-label{font-size:.65rem;color:var(--text2)}
+.rewards-row{display:flex;gap:7px;margin-bottom:1.2rem}
+.reward-item{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:.65rem;text-align:center}
+.reward-val{font-weight:700;font-size:.95rem;color:var(--accent2)}
+.reward-label{font-size:.65rem;color:var(--text2)}
+.go-btns{display:flex;gap:9px}
+.go-btns .btn{flex:1;justify-content:center;font-size:.9rem}
+/* CAREER */
+#screen-career{background:var(--bg);overflow-y:auto;justify-content:flex-start;padding:.9rem}
+.career-wrap{width:100%;max-width:480px;padding-bottom:2rem}
+.career-header{display:flex;align-items:center;gap:11px;margin-bottom:1.2rem}
+.back-btn{width:34px;height:34px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.career-title{font-family:var(--fd);font-size:1.9rem;color:var(--accent);letter-spacing:2px}
+.sec-label{font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:2px;margin-bottom:9px}
+.career-tabs{display:flex;gap:3px;background:var(--bg3);border-radius:10px;padding:3px;margin-bottom:1.2rem;flex-wrap:wrap}
+.ctab{flex:1;min-width:60px;padding:.45rem .3rem;border-radius:7px;font-size:.72rem;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--text2);transition:all .2s;text-align:center;white-space:nowrap}
+.ctab.active{background:var(--accent);color:#fff}
+.cpanel{display:none}
+.cpanel.active{display:block}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:1.2rem}
+.stats-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:.9rem}
+.stats-val{font-family:var(--fd);font-size:1.9rem;color:var(--accent2)}
+.stats-label{font-size:.7rem;color:var(--text2)}
+.upgrade-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:.9rem;margin-bottom:7px;display:flex;align-items:center;gap:11px}
+.up-icon{font-size:1.4rem;width:36px;text-align:center}
+.up-info{flex:1}
+.up-name{font-weight:600;font-size:.85rem}
+.up-desc{font-size:.7rem;color:var(--text2)}
+.up-level{display:flex;gap:3px;margin-top:4px}
+.ldot{width:7px;height:7px;border-radius:50%;background:var(--border);border:1px solid var(--text3)}
+.ldot.filled{background:var(--accent);border-color:var(--accent)}
+.up-btn{padding:5px 12px;border-radius:7px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-size:.75rem;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.up-btn:hover{background:var(--accent);color:#fff}
+.up-btn:disabled{border-color:var(--border);color:var(--text3);cursor:not-allowed}
+.lb-row{display:flex;align-items:center;gap:9px;padding:.65rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:5px}
+.lb-rank{font-family:var(--fd);font-size:1.1rem;width:22px;color:var(--text2)}
+.lb-name{flex:1;font-weight:500;font-size:.85rem}
+.lb-score{font-family:var(--fd);font-size:1rem;color:var(--accent2)}
+.lb-highlight{border-color:var(--accent);background:rgba(255,107,43,.08)}
+.season-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:.9rem;margin-bottom:7px}
+.season-title{font-weight:700;font-size:.85rem;margin-bottom:4px}
+.season-bar{height:5px;background:var(--bg);border-radius:3px;overflow:hidden;margin:7px 0}
+.season-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--accent));border-radius:3px;transition:width .5s}
+.season-meta{font-size:.7rem;color:var(--text2);display:flex;justify-content:space-between}
+.ach-item{display:flex;align-items:center;gap:11px;padding:.65rem;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:5px}
+.ach-icon{font-size:1.3rem;width:36px;text-align:center;opacity:.4}
+.ach-icon.unlocked{opacity:1}
+.ach-info{flex:1}
+.ach-name{font-weight:600;font-size:.8rem}
+.ach-desc{font-size:.7rem;color:var(--text2)}
+.ach-badge{font-size:.65rem;padding:2px 7px;border-radius:20px;background:var(--bg);color:var(--text3);border:1px solid var(--border)}
+.ach-badge.unlocked{background:rgba(34,197,94,.15);color:var(--green);border-color:var(--green)}
+/* Tournament/League/Challenges */
+.bracket-round{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:.65rem .9rem;display:flex;align-items:center;gap:9px;margin-bottom:7px}
+.bracket-round.active{border-color:var(--accent)}
+.bracket-round.done{opacity:.6}
+.bracket-round.locked{opacity:.35;pointer-events:none}
+.bracket-label{flex:1;font-size:.82rem;font-weight:600}
+.bracket-vs{font-size:.7rem;color:var(--text2)}
+.bracket-result{font-family:var(--fd);font-size:1rem}
+.bracket-result.win{color:var(--green)}
+.bracket-result.loss{color:var(--accent)}
+.league-row{display:flex;align-items:center;gap:7px;padding:.55rem .7rem;background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:4px;font-size:.82rem}
+.league-row.player-row{border-color:var(--accent);background:rgba(255,107,43,.08)}
+.league-pos{font-family:var(--fd);font-size:.95rem;width:18px;color:var(--text2);text-align:center}
+.league-name{flex:1;font-weight:500}
+.league-stat{color:var(--text2);font-size:.75rem;min-width:26px;text-align:center}
+.league-pts{font-family:var(--fd);font-size:.95rem;color:var(--accent2);min-width:26px;text-align:right}
+.chall-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:.7rem .9rem;margin-bottom:7px}
+.chall-header{display:flex;align-items:center;gap:9px;margin-bottom:5px}
+.chall-icon{font-size:1.1rem}
+.chall-name{flex:1;font-weight:600;font-size:.85rem}
+.chall-rew{font-size:.75rem;color:var(--accent2);font-weight:600}
+.chall-desc{font-size:.7rem;color:var(--text2);margin-bottom:5px}
+.chall-bar{height:4px;background:var(--bg);border-radius:3px;overflow:hidden}
+.chall-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--blue),var(--accent));transition:width .4s}
+.chall-prog{font-size:.65rem;color:var(--text3);margin-top:3px}
+.chall-item.done{border-color:var(--green)}
+.chall-item.done .chall-fill{background:var(--green)}
+/* Wind/Toast/LevelUp */
+.wind-badge{background:rgba(59,130,246,.2);border:1px solid rgba(59,130,246,.3);color:var(--blue);padding:3px 9px;border-radius:20px;font-size:.7rem;font-weight:600}
+.toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--bg2);border:1px solid var(--border);border-radius:50px;padding:.55rem 1.1rem;font-size:.8rem;font-weight:600;z-index:999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{border-color:var(--green);color:var(--green)}
+.toast.info{border-color:var(--accent);color:var(--accent)}
+@keyframes scoreFlash{0%{background:rgba(59,130,246,.3)}100%{background:transparent}}
+.ai-scored{animation:scoreFlash .5s ease}
+.aim-touch-btns{display:none;gap:7px}
+.aim-touch-btn{width:48px;height:48px;border-radius:11px;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;user-select:none;-webkit-user-select:none;transition:background .1s}
+.aim-touch-btn:active{background:var(--accent);border-color:var(--accent)}
+@media(max-width:420px){
+  .game-hud{padding:.45rem .7rem}
+  .hud-sv{font-size:2rem}
+  .game-controls{padding:.35rem .7rem .55rem}
+  .aim-label{display:none}
+  .aim-touch-btns{display:flex}
+}
+@media(max-height:680px){.hud-sv{font-size:1.8rem}.shoot-btn{width:58px;height:58px}.power-bar{height:62px}}
+@media(max-height:560px){.shoot-btn{width:50px;height:50px;font-size:.65rem}.ctrl-btn{width:32px;height:32px}}
+.lup-overlay{position:fixed;inset:0;background:rgba(255,107,43,.15);z-index:200;display:flex;align-items:center;justify-content:center;animation:lupPulse .8s ease forwards;pointer-events:none}
+@keyframes lupPulse{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
+.lup-text{font-family:var(--fd);font-size:3.5rem;color:var(--accent);letter-spacing:4px;text-align:center;animation:lupScale .8s ease forwards}
+@keyframes lupScale{0%{transform:scale(.5);opacity:0}40%{transform:scale(1.1);opacity:1}70%{transform:scale(1);opacity:1}100%{transform:scale(1.2);opacity:0}}
+</style>
+</head>
+<body>
+
+<!-- LANG BUTTON -->
+<button id="lang-btn">EN</button>
+
+<!-- ONBOARDING -->
+<div id="screen-onboard" class="screen active">
+  <div class="ob-wrap">
+    <div class="ob-step active" id="ob-step-1">
+      <span class="ob-icon">🏀</span>
+      <div class="ob-title">BASKET VS AI</div>
+      <div class="ob-sub" data-i18n="ob1sub">Full career mode. Beat the AI, earn XP, buy upgrades and conquer the league.</div>
+    </div>
+    <div class="ob-step" id="ob-step-2">
+      <span class="ob-icon">🎯</span>
+      <div class="ob-title" data-i18n="ob2title">HOW TO PLAY</div>
+      <div class="ob-sub" data-i18n="ob2sub"><strong>Desktop:</strong> Hold Space or click for power. A/D to aim.<br><br><strong>Mobile:</strong> Hold SHOOT button. Release in the yellow zone for a perfect shot.</div>
+    </div>
+    <div class="ob-step" id="ob-step-3">
+      <span class="ob-icon">🏆</span>
+      <div class="ob-title" data-i18n="ob3title">CAREER MODE</div>
+      <div class="ob-sub" data-i18n="ob3sub">Win matches for XP and cash. Buy upgrades. Unlock playoff after stage 10 with 250+ fans.</div>
+    </div>
+    <div class="ob-dots">
+      <div class="ob-dot active"></div><div class="ob-dot"></div><div class="ob-dot"></div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button class="btn btn-s" id="ob-skip" data-i18n="ob_skip">Skip</button>
+      <button class="btn btn-p" id="ob-next" data-i18n="ob_next">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MENU -->
+<div id="screen-menu" class="screen">
+  <div class="menu-wrap">
+    <div class="menu-logo">BASKET</div>
+    <div class="menu-sub">vs AI · Career 3.0</div>
+    <div class="player-card">
+      <div class="avatar">🏀</div>
+      <div class="player-info">
+        <div class="player-name" id="menu-pname">Rookie</div>
+        <div class="player-meta" id="menu-pmeta">Level 1 · 0/100 XP</div>
+        <div class="xp-bar"><div class="xp-fill" id="menu-xpbar" style="width:0%"></div></div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:.75rem;color:var(--text2)">💰 <span id="menu-cash">0</span></div>
+        <div style="font-size:.75rem;color:var(--text2)">👥 <span id="menu-fans">0</span></div>
+      </div>
+    </div>
+    <div class="menu-actions">
+      <button class="mbtn mbtn-main" id="btn-play"><span>▶</span> <span data-i18n="menu_play">Play match</span></button>
+      <button class="mbtn mbtn-sec" id="btn-career"><span>📊</span> <span data-i18n="menu_career">Career & stats</span></button>
+      <button class="mbtn mbtn-sec" id="btn-settings"><span>⚙️</span> <span data-i18n="menu_settings">Match settings</span></button>
+      <button class="mbtn mbtn-sec" id="btn-reset" style="color:var(--text3);font-size:.82rem"><span>🗑</span> <span data-i18n="menu_reset">Reset career</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="modal-settings">
+  <div class="modal">
+    <div class="modal-title" data-i18n="set_title">MATCH SETTINGS</div>
+    <div class="srow"><span class="slabel" data-i18n="set_oponent">Opponent</span>
+      <div class="pill-group">
+        <button class="pill active" data-group="oponent" data-val="ai">AI</button>
+        <button class="pill" data-group="oponent" data-val="p2">P2</button>
+      </div>
+    </div>
+    <div class="srow"><span class="slabel" data-i18n="set_mode">Mode</span>
+      <div class="pill-group">
+        <button class="pill active" data-group="mode" data-val="classic">Classic</button>
+        <button class="pill" data-group="mode" data-val="blitz">Blitz</button>
+        <button class="pill" data-group="mode" data-val="moving">Moving</button>
+        <button class="pill" data-group="mode" data-val="chaos">Chaos</button>
+      </div>
+    </div>
+    <div class="srow"><span class="slabel" data-i18n="set_diff">Difficulty</span>
+      <div class="pill-group">
+        <button class="pill" data-group="diff" data-val="easy">Easy</button>
+        <button class="pill active" data-group="diff" data-val="normal">Normal</button>
+        <button class="pill" data-group="diff" data-val="hard">Hard</button>
+        <button class="pill" data-group="diff" data-val="pro">Pro</button>
+      </div>
+    </div>
+    <div class="srow"><span class="slabel" data-i18n="set_time">Time (s)</span>
+      <div class="pill-group">
+        <button class="pill" data-group="time" data-val="30">30</button>
+        <button class="pill active" data-group="time" data-val="60">60</button>
+        <button class="pill" data-group="time" data-val="90">90</button>
+      </div>
+    </div>
+    <div class="srow"><span class="slabel" data-i18n="set_sound">Sound</span>
+      <div class="pill-group">
+        <button class="pill active" data-group="sound" data-val="on">On</button>
+        <button class="pill" data-group="sound" data-val="off">Off</button>
+      </div>
+    </div>
+    <button class="modal-close" id="settings-close" data-i18n="set_done">✓ Done</button>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="screen-game" class="screen">
+  <div class="game-hud">
+    <div class="hud-score">
+      <div class="hud-sv" id="hud-p1">0</div>
+      <div class="hud-sl" data-i18n="hud_you">YOU</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+      <div><div class="hud-tv" id="hud-timer">60</div><div class="hud-tl" data-i18n="hud_sec">SEC</div></div>
+      <div class="combo-badge hidden" id="combo-badge">x1</div>
+    </div>
+    <div class="hud-score">
+      <div class="hud-sv" id="hud-p2">0</div>
+      <div class="hud-sl" id="hud-p2label">AI</div>
+    </div>
+  </div>
+  <div class="gcw"><canvas id="gameCanvas"></canvas></div>
+  <div class="game-controls">
+    <div class="power-bar"><div class="power-fill" id="power-fill" style="height:0%;background:var(--green)"></div></div>
+    <div class="aim-bar">
+      <div style="display:flex;gap:7px;align-items:center;margin-bottom:3px">
+        <span id="wind-display" class="wind-badge" style="display:none"></span>
+        <span style="font-size:.65rem;color:var(--text3)" id="mode-label">CLASSIC · NORMAL</span>
+      </div>
+      <div class="aim-indicator"><div class="aim-cursor" id="aim-cursor" style="left:50%"></div></div>
+      <div class="aim-label" data-i18n="aim_hint">A / D or ← / → to aim</div>
+      <div class="aim-touch-btns" id="aim-touch-btns">
+        <button class="aim-touch-btn" id="aim-left-btn">◀</button>
+        <button class="aim-touch-btn" id="aim-right-btn">▶</button>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:7px">
+      <div class="ctrl-btns">
+        <button class="ctrl-btn" id="btn-pause">⏸</button>
+        <button class="ctrl-btn" id="btn-fullscreen">⛶</button>
+      </div>
+      <button class="shoot-btn" id="shoot-btn">SHOOT</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME OVER -->
+<div id="screen-gameover" class="screen">
+  <div class="go-wrap">
+    <div class="go-title" id="go-title">GAME OVER</div>
+    <div class="go-score" id="go-score">0–0</div>
+    <div class="go-label" id="go-label">Final score</div>
+    <div class="go-stats">
+      <div class="stat-card"><div class="stat-val" id="go-acc">0%</div><div class="stat-label" data-i18n="go_acc">Accuracy</div></div>
+      <div class="stat-card"><div class="stat-val" id="go-combo">0</div><div class="stat-label" data-i18n="go_combo">Best Combo</div></div>
+      <div class="stat-card"><div class="stat-val" id="go-perfect">0</div><div class="stat-label" data-i18n="go_perfect">Perfect Shots</div></div>
+      <div class="stat-card"><div class="stat-val" id="go-shots">0</div><div class="stat-label" data-i18n="go_shots">Total Shots</div></div>
+    </div>
+    <div class="rewards-row">
+      <div class="reward-item"><div class="reward-val" id="go-xp">+0 XP</div><div class="reward-label" data-i18n="go_xp">Experience</div></div>
+      <div class="reward-item"><div class="reward-val" id="go-cash">+$0</div><div class="reward-label" data-i18n="go_cash">Cash</div></div>
+      <div class="reward-item"><div class="reward-val" id="go-fans">+0</div><div class="reward-label" data-i18n="go_fans">Fans</div></div>
+    </div>
+    <div class="go-btns">
+      <button class="btn btn-s" id="go-menu" data-i18n="go_menu">Menu</button>
+      <button class="btn btn-p" id="go-replay" data-i18n="go_replay">Play again ↺</button>
+    </div>
+  </div>
+</div>
+
+<!-- CAREER -->
+<div id="screen-career" class="screen">
+  <div class="career-wrap">
+    <div class="career-header">
+      <button class="back-btn" id="career-back">←</button>
+      <div class="career-title" data-i18n="car_title">CAREER</div>
+    </div>
+    <div class="career-tabs">
+      <button class="ctab active" data-tab="stats" data-i18n="tab_stats">Stats</button>
+      <button class="ctab" data-tab="upgrades" data-i18n="tab_shop">Shop</button>
+      <button class="ctab" data-tab="leaderboard" data-i18n="tab_top">Top</button>
+      <button class="ctab" data-tab="achievements" data-i18n="tab_trofee">Trophies</button>
+      <button class="ctab" data-tab="season" data-i18n="tab_season">Season</button>
+      <button class="ctab" data-tab="turneu">🏆 <span data-i18n="tab_tour">Tournament</span></button>
+      <button class="ctab" data-tab="liga">🥇 <span data-i18n="tab_league">League</span></button>
+      <button class="ctab" data-tab="provocari">⚡ <span data-i18n="tab_chall">Challenges</span></button>
+    </div>
+
+    <div class="cpanel active" id="tab-stats">
+      <div class="sec-label" data-i18n="stats_season_label">Season 1 · Stage <span id="career-etapa">1</span>/10</div>
+      <div class="stats-grid">
+        <div class="stats-card"><div class="stats-val" id="cs-games">0</div><div class="stats-label" data-i18n="s_games">Matches</div></div>
+        <div class="stats-card"><div class="stats-val" id="cs-wins">0</div><div class="stats-label" data-i18n="s_wins">Wins</div></div>
+        <div class="stats-card"><div class="stats-val" id="cs-baskets">0</div><div class="stats-label" data-i18n="s_baskets">Total baskets</div></div>
+        <div class="stats-card"><div class="stats-val" id="cs-wr">0%</div><div class="stats-label" data-i18n="s_wr">Win rate</div></div>
+        <div class="stats-card"><div class="stats-val" id="cs-best">0</div><div class="stats-label" data-i18n="s_best">Best score</div></div>
+        <div class="stats-card"><div class="stats-val" id="cs-streak">0</div><div class="stats-label" data-i18n="s_streak">Best streak</div></div>
+        <div class="stats-card"><div class="stats-val" id="cs-perfect">0</div><div class="stats-label" data-i18n="s_perfect">Perfect shots</div></div>
+        <div class="stats-card"><div class="stats-val" id="cs-combo">0</div><div class="stats-label" data-i18n="s_combo">Best combo</div></div>
+      </div>
+      <div class="sec-label" data-i18n="s_resources">Resources</div>
+      <div style="display:flex;gap:7px;margin-bottom:1.2rem">
+        <div class="stats-card" style="flex:1"><div class="stats-val" id="cs-cash">$0</div><div class="stats-label" data-i18n="s_cash">Cash</div></div>
+        <div class="stats-card" style="flex:1"><div class="stats-val" id="cs-fans">0</div><div class="stats-label" data-i18n="s_fans">Fans</div></div>
+        <div class="stats-card" style="flex:1"><div class="stats-val" id="cs-energy">100</div><div class="stats-label" data-i18n="s_energy">Energy</div></div>
+      </div>
+    </div>
+
+    <div class="cpanel" id="tab-upgrades">
+      <div class="sec-label"><span data-i18n="up_avail">Available upgrades</span> · <span id="up-cash-disp">$0</span></div>
+      <div id="upgrades-list"></div>
+    </div>
+
+    <div class="cpanel" id="tab-leaderboard">
+      <div class="sec-label" data-i18n="lb_title">Local leaderboard</div>
+      <div id="lb-list"></div>
+      <div style="margin-top:11px;font-size:.7rem;color:var(--text3)" data-i18n="lb_note">📌 Your score is highlighted</div>
+    </div>
+
+    <div class="cpanel" id="tab-achievements">
+      <div class="sec-label" data-i18n="ach_title">Achievements</div>
+      <div id="ach-list"></div>
+    </div>
+
+    <div class="cpanel" id="tab-season">
+      <div class="sec-label" data-i18n="sea_title">Season progress</div>
+      <div id="season-list"></div>
+    </div>
+
+    <div class="cpanel" id="tab-turneu">
+      <div class="sec-label" data-i18n="tur_title">Current tournament</div>
+      <div id="turneu-list"></div>
+    </div>
+
+    <div class="cpanel" id="tab-liga">
+      <div class="sec-label"><span data-i18n="lig_title">League standings</span> · <span data-i18n="lig_season">Season</span> <span id="liga-sezon">1</span></div>
+      <div style="display:flex;gap:4px;font-size:.65rem;color:var(--text3);padding:0 .7rem 5px;letter-spacing:1px">
+        <span style="width:18px">#</span><span style="flex:1" data-i18n="lig_player">Player</span>
+        <span style="min-width:26px;text-align:center">W</span>
+        <span style="min-width:26px;text-align:center">L</span>
+        <span style="min-width:26px;text-align:right" data-i18n="lig_pts">Pts</span>
+      </div>
+      <div id="liga-list"></div>
+    </div>
+
+    <div class="cpanel" id="tab-provocari">
+      <div class="sec-label" data-i18n="ch_title">Daily &amp; weekly challenges</div>
+      <div id="provocari-list"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// i18n
+// ============================================================
+const STRINGS = {
+  en: {
+    ob1sub:'Full career mode. Beat the AI, earn XP, buy upgrades and conquer the league.',
+    ob2title:'HOW TO PLAY',ob2sub:'<strong>Desktop:</strong> Hold Space or click for power. A/D to aim.<br><br><strong>Mobile:</strong> Hold SHOOT. Release in the yellow zone for a perfect shot.',
+    ob3title:'CAREER MODE',ob3sub:'Win matches for XP and cash. Buy upgrades from the shop. Unlock playoff after stage 10 with 250+ fans.',
+    ob_skip:'Skip',ob_next:'Continue →',ob_next_last:'Play! 🏀',
+    menu_play:'Play match',menu_career:'Career & stats',menu_settings:'Match settings',menu_reset:'Reset career',
+    set_title:'MATCH SETTINGS',set_oponent:'Opponent',set_mode:'Mode',set_diff:'Difficulty',set_time:'Time (s)',set_sound:'Sound',set_done:'✓ Done',
+    hud_you:'YOU',hud_sec:'SEC',aim_hint:'A / D or ← / → to aim',
+    go_acc:'Accuracy',go_combo:'Best Combo',go_perfect:'Perfect Shots',go_shots:'Total Shots',go_xp:'Experience',go_cash:'Cash',go_fans:'Fans',
+    go_menu:'Menu',go_replay:'Play again ↺',go_win:'🏆 VICTORY!',go_loss:'😤 DEFEAT',go_win_label:'You won the match!',go_loss_label:'Match lost',
+    car_title:'CAREER',tab_stats:'Stats',tab_shop:'Shop',tab_top:'Top',tab_trofee:'Trophies',tab_season:'Season',tab_tour:'Tournament',tab_league:'League',tab_chall:'Challenges',
+    stats_season_label:'Season 1 · Stage',
+    s_games:'Matches',s_wins:'Wins',s_baskets:'Total baskets',s_wr:'Win rate',s_best:'Best score',s_streak:'Best streak',s_perfect:'Perfect shots',s_combo:'Best combo',
+    s_resources:'Resources',s_cash:'Cash',s_fans:'Fans',s_energy:'Energy',
+    up_avail:'Available upgrades',
+    lb_title:'Local leaderboard',lb_note:'📌 Your score is highlighted',
+    ach_title:'Achievements',ach_locked:'Locked',ach_unlocked:'✓ Unlocked',
+    sea_title:'Season progress',
+    tur_title:'Current tournament',tur_locked:'🔒 Locked',tur_locked_desc:'Requires 3 wins or 50 fans',tur_play:'Play',tur_done_msg:'Tournament finished',tur_prize:'Prize:',tur_new:'New tournament',
+    lig_title:'League standings',lig_season:'Season',lig_player:'Player',lig_pts:'Pts',lig_play:'Play league match',
+    ch_title:'Daily & weekly challenges',ch_daily:'Daily',ch_weekly:'Weekly',ch_done:'✓ Completed',
+    up_max:'MAX',up_buy:'Buy',up_nocash:'Not enough cash!',up_bought:'Upgrade purchased',
+    reset_confirm:'Reset entire career? Cannot be undone.',reset_done:'Career reset',
+    career_active:'Active career',
+    lvl_label:['Rookie','Amateur','Semi-Pro','Pro','Elite','Star','All-Star','Legend','Hall of Fame','GOAT'],
+    level_prefix:'Level',
+    tur_rounds:['Qualifiers','Quarter-finals','Semi-finals','Final'],
+    tur_oponents:['Rookie Bot','Silver Hawk','Iron Bear','Legend X'],
+    chall_defs:[
+      {name:'5 baskets today',desc:'Score 5 baskets in a single match'},
+      {name:'3 perfect shots',desc:'3 perfect shots in one match'},
+      {name:'2 wins in a row',desc:'Win 2 consecutive matches'},
+      {name:'50 total baskets',desc:'Score 50 baskets total this week'},
+      {name:'Combo x8',desc:'Reach a combo of 8 in one match'},
+      {name:'60%+ win rate',desc:'Maintain 60%+ win rate over 10 matches'},
+    ],
+    chall_rewards:['$50','$80','$100 + 10 fans','$300 + 30 fans','$200 + XP','$500 + 50 fans'],
+    chall_types:['Daily','Daily','Daily','Weekly','Weekly','Weekly'],
+    perfect_txt:'PERFECT! ✨',score_txt:'+2 🏀',
+    wind_left:'← Wind',wind_right:'Wind →',
+    combo_label:'🔥',
+    playoff_locked:'🔒 Requires stage 10 + 250 fans',
+    playoff_unlocked:'✓ Unlocked',
+    fans_label:'Fans:',
+  },
+  ro: {
+    ob1sub:'Career mode complet. Luptă contra AI-ului, acumulează XP, cumpără upgrade-uri și cucerește liga.',
+    ob2title:'CUM JOCI',ob2sub:'<strong>Desktop:</strong> Ține Space sau click pentru putere. A/D pentru aim.<br><br><strong>Mobil:</strong> Ține apăsat SHOOT. Eliberează în zona galbenă pentru perfect shot.',
+    ob3title:'CAREER MODE',ob3sub:'Câștigă meciuri pentru XP și cash. Cumpără upgrade-uri din shop. Deblochează playoff după etapa 10 cu 250+ fani.',
+    ob_skip:'Sari peste',ob_next:'Continuă →',ob_next_last:'Joacă! 🏀',
+    menu_play:'Joacă meci',menu_career:'Carieră & statistici',menu_settings:'Setări meci',menu_reset:'Reset carieră',
+    set_title:'SETĂRI MECI',set_oponent:'Oponent',set_mode:'Mod',set_diff:'Dificultate',set_time:'Timp (s)',set_sound:'Sunet',set_done:'✓ Gata',
+    hud_you:'TU',hud_sec:'SEC',aim_hint:'A / D sau ← / → pentru aim',
+    go_acc:'Precizie',go_combo:'Best Combo',go_perfect:'Perfect Shots',go_shots:'Total Aruncări',go_xp:'Experiență',go_cash:'Cash',go_fans:'Fani',
+    go_menu:'Meniu',go_replay:'Joacă din nou ↺',go_win:'🏆 VICTORIE!',go_loss:'😤 ÎNFRÂNGERE',go_win_label:'Ai câștigat meciul!',go_loss_label:'Meci pierdut',
+    car_title:'CARIERĂ',tab_stats:'Stats',tab_shop:'Shop',tab_top:'Top',tab_trofee:'Trofee',tab_season:'Sezon',tab_tour:'Turneu',tab_league:'Ligă',tab_chall:'Provocări',
+    stats_season_label:'Sezon 1 · Etapa',
+    s_games:'Meciuri',s_wins:'Victorii',s_baskets:'Coșuri totale',s_wr:'Win rate',s_best:'Best score',s_streak:'Best streak',s_perfect:'Perfect shots',s_combo:'Best combo',
+    s_resources:'Resurse',s_cash:'Cash',s_fans:'Fani',s_energy:'Energie',
+    up_avail:'Upgrade-uri disponibile',
+    lb_title:'Leaderboard local',lb_note:'📌 Scorul tău e evidențiat',
+    ach_title:'Achievement-uri',ach_locked:'Blocat',ach_unlocked:'✓ Deblocat',
+    sea_title:'Progres sezon',
+    tur_title:'Turneu curent',tur_locked:'🔒 Blocat',tur_locked_desc:'Necesită 3 victorii sau 50 fani',tur_play:'Joacă',tur_done_msg:'Turneu terminat',tur_prize:'Premiu:',tur_new:'Turneu nou',
+    lig_title:'Clasament ligă',lig_season:'Sezon',lig_player:'Jucător',lig_pts:'Pct',lig_play:'Joacă meci de ligă',
+    ch_title:'Provocări zilnice & săptămânale',ch_daily:'Zilnice',ch_weekly:'Săptămânale',ch_done:'✓ Completat',
+    up_max:'MAX',up_buy:'Cumpără',up_nocast:'Nu ai suficient cash!',up_bought:'Upgrade cumpărat',
+    reset_confirm:'Resetezi toată cariera? Nu se poate anula.',reset_done:'Carieră resetată',
+    career_active:'Carieră activă',
+    lvl_label:['Rookie','Amateur','Semi-Pro','Pro','Elite','Star','All-Star','Legend','Hall of Fame','GOAT'],
+    level_prefix:'Nivel',
+    tur_rounds:['Calificări','Sferturi','Semifinale','Finală'],
+    tur_oponents:['Rookie Bot','Silver Hawk','Iron Bear','Legend X'],
+    chall_defs:[
+      {name:'5 coșuri azi',desc:'Marchează 5 coșuri într-un singur meci'},
+      {name:'3 perfect shots',desc:'3 perfect shots într-un meci'},
+      {name:'2 victorii la rând',desc:'Câștigă 2 meciuri consecutive'},
+      {name:'50 coșuri total',desc:'Marchează 50 coșuri în total săptămâna aceasta'},
+      {name:'Combo x8',desc:'Atinge un combo de 8 într-un meci'},
+      {name:'Win rate 60%+',desc:'Menține un win rate de 60%+ pe 10 meciuri'},
+    ],
+    chall_rewards:['$50','$80','$100 + 10 fani','$300 + 30 fani','$200 + XP','$500 + 50 fani'],
+    chall_types:['Zilnic','Zilnic','Zilnic','Săptămânal','Săptămânal','Săptămânal'],
+    perfect_txt:'PERFECT! ✨',score_txt:'+2 🏀',
+    wind_left:'← Vânt',wind_right:'Vânt →',
+    combo_label:'🔥',
+    playoff_locked:'🔒 Necesită etapa 10 + 250 fani',
+    playoff_unlocked:'✓ Deblocat',
+    fans_label:'Fani:',
+  }
+};
+
+let lang = localStorage.getItem('bva_lang') || 'en';
+function t(k){ return STRINGS[lang][k] || STRINGS.en[k] || k; }
+
+function applyLang() {
+  document.getElementById('lang-btn').textContent = lang === 'en' ? 'RO' : 'EN';
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.dataset.i18n;
+    const s = t(k);
+    if(s) el.innerHTML = s;
+  });
+  // Dynamic elements
+  if(document.getElementById('screen-menu').classList.contains('active')) updateMenuUI();
+  if(document.getElementById('screen-career').classList.contains('active')) updateCareerUI();
+  if(document.getElementById('screen-onboard').classList.contains('active')) {
+    const btnNext = document.getElementById('ob-next');
+    btnNext.textContent = obStep === OB_STEPS ? t('ob_next_last') : t('ob_next');
+  }
+}
+
+document.getElementById('lang-btn').addEventListener('click', () => {
+  lang = lang === 'en' ? 'ro' : 'en';
+  localStorage.setItem('bva_lang', lang);
+  applyLang();
+});
+
+// ============================================================
+// STATE
+// ============================================================
+const SAVE_KEY = 'basket_career_v3';
+let save = loadSave();
+
+function defaultSave() {
+  return {
+    firstTime:true, level:1, xp:0, cash:0, fans:0, energy:100, season:1, etapa:1,
+    stats:{games:0,wins:0,losses:0,baskets:0,shots:0,perfect:0,bestScore:0,bestStreak:0,bestCombo:0,streak:0},
+    upgrades:{power:1,window:1,wind:1,stamina:1},
+    leaderboard:[
+      {name:'Bot Alpha',score:22},{name:'DrainKing',score:19},
+      {name:'ShotClock',score:17},{name:'NetBurner',score:15},{name:'AirBall',score:12}
+    ],
+    achievements:[],
+    turneu:{round:0,results:[],active:false},
+    liga:{table:[
+      {name:'Slam Dunk FC',w:6,l:1,pts:18},{name:'Iron Nets',w:5,l:2,pts:15},
+      {name:'Fast Break',w:4,l:3,pts:12},{name:'Tu / You',w:0,l:0,pts:0,isPlayer:true},
+      {name:'Cold Range',w:2,l:5,pts:6},{name:'Air Ballers',w:1,l:6,pts:3},
+    ]},
+    provocari:{}
+  };
+}
+function loadSave(){ try{const s=localStorage.getItem(SAVE_KEY);return s?JSON.parse(s):defaultSave();}catch(e){return defaultSave();} }
+function persist(){ try{localStorage.setItem(SAVE_KEY,JSON.stringify(save));}catch(e){} }
+
+// ============================================================
+// XP/LEVEL
+// ============================================================
+const XP_TABLE=[0,100,250,450,700,1050,1500,2100,2900,4000];
+function xpNeeded(lvl){return XP_TABLE[Math.min(lvl,XP_TABLE.length-1)]||lvl*500;}
+function levelLabel(lvl){return (t('lvl_label')||[])[Math.min(lvl-1,9)]||'GOAT';}
+
+// ============================================================
+// SETTINGS
+// ============================================================
+let settings={oponent:'ai',mode:'classic',diff:'normal',time:60,sound:'on'};
+
+// ============================================================
+// SCREENS
+// ============================================================
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  if(id==='menu') updateMenuUI();
+  if(id==='career') updateCareerUI();
+}
+
+// ============================================================
+// ONBOARDING
+// ============================================================
+let obStep=1;
+const OB_STEPS=3;
+document.getElementById('ob-next').addEventListener('click',()=>{
+  if(obStep<OB_STEPS){
+    document.getElementById('ob-step-'+obStep).classList.remove('active');
+    obStep++;
+    document.getElementById('ob-step-'+obStep).classList.add('active');
+    document.querySelectorAll('.ob-dot').forEach((d,i)=>d.classList.toggle('active',i+1===obStep));
+    document.getElementById('ob-next').textContent=obStep===OB_STEPS?t('ob_next_last'):t('ob_next');
+  } else finishOnboard();
+});
+document.getElementById('ob-skip').addEventListener('click',finishOnboard);
+function finishOnboard(){save.firstTime=false;persist();showScreen('menu');}
+if(!save.firstTime) showScreen('menu');
+
+// ============================================================
+// MENU
+// ============================================================
+function updateMenuUI(){
+  const n=xpNeeded(save.level);
+  document.getElementById('menu-pname').textContent=levelLabel(save.level)+' · '+t('level_prefix')+' '+save.level;
+  document.getElementById('menu-pmeta').textContent=save.xp+' / '+n+' XP';
+  document.getElementById('menu-xpbar').style.width=Math.min(100,(save.xp/n)*100)+'%';
+  document.getElementById('menu-cash').textContent='$'+save.cash;
+  document.getElementById('menu-fans').textContent=save.fans;
+}
+document.getElementById('btn-play').addEventListener('click',()=>startGame());
+document.getElementById('btn-career').addEventListener('click',()=>showScreen('career'));
+document.getElementById('btn-settings').addEventListener('click',()=>document.getElementById('modal-settings').classList.add('open'));
+document.getElementById('settings-close').addEventListener('click',()=>document.getElementById('modal-settings').classList.remove('open'));
+document.getElementById('btn-reset').addEventListener('click',()=>{
+  if(confirm(t('reset_confirm'))){save=defaultSave();persist();updateMenuUI();toast(t('reset_done'),'info');}
+});
+
+// ============================================================
+// PILLS
+// ============================================================
+document.querySelectorAll('.pill').forEach(p=>{
+  p.addEventListener('click',()=>{
+    const g=p.dataset.group,v=p.dataset.val;
+    document.querySelectorAll(`.pill[data-group="${g}"]`).forEach(x=>x.classList.remove('active'));
+    p.classList.add('active');
+    settings[g]=v;
+    if(g==='time') settings.time=parseInt(v);
+  });
+});
+
+// ============================================================
+// GAME ENGINE
+// ============================================================
+const canvas=document.getElementById('gameCanvas');
+const ctx=canvas.getContext('2d');
+let G=null;
+function resizeCanvas(){
+  const wrap=canvas.parentElement;
+  const W=Math.min(wrap.clientWidth,480);
+  const H=wrap.clientHeight;
+  canvas.width=W; canvas.height=H;
+  if(G) G.resize(W,H);
+}
+window.addEventListener('resize',resizeCanvas);
+
+class GameState{
+  constructor(cfg){
+    this.cfg=cfg; this.W=canvas.width; this.H=canvas.height;
+    this.score1=0; this.score2=0; this.timeLeft=cfg.time;
+    this.running=false; this.paused=false; this.shooting=false;
+    this.power=0; this.aim=0;
+    this.ball=null; this.inFlight=false;
+    this.shots=0; this.misses=0; this.perfects=0;
+    this.combo=0; this.bestCombo=0; this.wind=0;
+    this.aiTimer=0; this.aiBallAnim=null;
+    this.hoopX=this.W/2; this.hoopMoveDir=1;
+    this.particles=[]; this.lastTime=0; this.timerAcc=0;
+    this.initPositions();
+    if(cfg.mode==='chaos') this.wind=(Math.random()-.5)*.4;
+  }
+  resize(W,H){this.W=W;this.H=H;this.initPositions();}
+  initPositions(){
+    this.hoopY=this.H*.28; this.hoopRadius=Math.max(22,this.W*.07);
+    this.ballStartX=this.W/2; this.ballStartY=this.H*.75;
+    this.ballR=Math.max(14,this.W*.045);
+    if(!this.ball||!this.inFlight) this.ball={x:this.ballStartX,y:this.ballStartY,vx:0,vy:0};
+  }
+  start(){
+    this.running=true; this.lastTime=performance.now(); this.loop();
+    if(this.cfg.oponent==='ai') this.aiTimer=1500+Math.random()*2000;
+  }
+  loop(){
+    if(!this.running) return;
+    const now=performance.now(); const dt=Math.min(now-this.lastTime,50); this.lastTime=now;
+    if(!this.paused) this.update(dt);
+    this.draw();
+    requestAnimationFrame(()=>this.loop());
+  }
+  update(dt){
+    this.timerAcc+=dt;
+    if(this.timerAcc>=1000){
+      this.timerAcc-=1000; this.timeLeft--;
+      document.getElementById('hud-timer').textContent=this.timeLeft;
+      if(this.timeLeft<=10) document.getElementById('hud-timer').style.color='var(--accent)';
+      if(this.timeLeft<=0){this.running=false;endGame(this);return;}
+    }
+    if(this.cfg.mode==='moving'||this.cfg.mode==='chaos'){
+      const spd=this.cfg.mode==='chaos'?1.5:.8;
+      this.hoopX+=this.hoopMoveDir*spd;
+      if(this.hoopX>this.W-this.hoopRadius*2) this.hoopMoveDir=-1;
+      if(this.hoopX<this.hoopRadius*2) this.hoopMoveDir=1;
+    }
+    if(this.inFlight&&this.ball){
+      this.ball.vy+=.35; this.ball.vx+=this.wind;
+      this.ball.x+=this.ball.vx; this.ball.y+=this.ball.vy;
+      if(Math.random()<.3) this.particles.push({x:this.ball.x,y:this.ball.y,vx:(Math.random()-.5)*1.5,vy:(Math.random()-.5)*1.5,life:20,color:'rgba(255,180,80,.5)'});
+      // Hoop collision
+      const dx=this.ball.x-this.hoopX;
+      const dist=Math.abs(dx);
+      const rimR=this.hoopRadius;
+      const passing=this.ball.vy>0&&this.ball.y>=this.hoopY-4&&this.ball.y<=this.hoopY+this.ballR+6;
+      if(passing&&dist<rimR-this.ballR*.3){
+        this.score1++; this.shots++;
+        const isPerfect=dist<rimR*.35;
+        if(isPerfect) this.perfects++;
+        this.combo++;
+        if(this.combo>this.bestCombo) this.bestCombo=this.combo;
+        this.resetBall(); this.updateHUD(); this.showScore(isPerfect);
+        if(settings.sound==='on') playSound(isPerfect?'perfect':'score');
+        for(let i=0;i<12;i++) this.spawnP(this.hoopX,this.hoopY,`hsl(${30+Math.random()*30},100%,60%)`);
+      } else if(passing&&dist<rimR+this.ballR*.5&&dist>=rimR-this.ballR*.3){
+        this.ball.vx*=-.5; this.ball.vy*=-.4;
+      }
+      if(this.ball.y>this.H+50||this.ball.x<-50||this.ball.x>this.W+50){
+        this.shots++; this.misses++; this.combo=0;
+        this.resetBall(); this.updateHUD();
+        if(settings.sound==='on') playSound('miss');
+      }
+    }
+    if(this.cfg.oponent==='ai'){
+      this.aiTimer-=dt;
+      if(this.aiTimer<=0){
+        this.aiShoot();
+        const dm={easy:3000,normal:2000,hard:1200,pro:800};
+        this.aiTimer=(dm[this.cfg.diff]||2000)+Math.random()*1000;
+      }
+    }
+    this.particles=this.particles.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.life--;return p.life>0;});
+    const badge=document.getElementById('combo-badge');
+    if(this.combo>1){badge.classList.remove('hidden');badge.textContent='x'+this.combo+' '+t('combo_label');}
+    else badge.classList.add('hidden');
+    if(this.cfg.mode==='chaos'){
+      const wd=document.getElementById('wind-display');
+      wd.style.display='';
+      wd.textContent=(this.wind>0?t('wind_right'):t('wind_left'))+' '+Math.abs(this.wind).toFixed(2);
+      if(Math.random()<.005) this.wind=(Math.random()-.5)*.5;
+    }
+  }
+  aiShoot(){
+    const dm={easy:.55,normal:.72,hard:.85,pro:.93};
+    if(Math.random()<(dm[this.cfg.diff]||.72)){
+      const ax=this.W*.82,ay=this.H*.38;
+      this.aiBallAnim={sx:this.W*.15,sy:this.H*.72,t:0,scored:false};
+    }
+  }
+  showScore(perfect){
+    const el=document.createElement('div');
+    el.className='float-text';
+    el.style.cssText=`left:${this.hoopX-30}px;top:${this.hoopY-20}px;color:${perfect?'var(--gold)':'var(--green)'}`;
+    el.textContent=perfect?t('perfect_txt'):t('score_txt');
+    canvas.parentElement.appendChild(el);
+    setTimeout(()=>el.remove(),1000);
+  }
+  spawnP(x,y,color){
+    const a=Math.random()*Math.PI*2,s=2+Math.random()*4;
+    this.particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-2,life:30,color});
+  }
+  resetBall(){this.inFlight=false;this.ball={x:this.ballStartX,y:this.ballStartY,vx:0,vy:0};this.power=0;}
+  updateHUD(){document.getElementById('hud-p1').textContent=this.score1;document.getElementById('hud-p2').textContent=this.score2;}
+  _calcShot(power,aim){
+    const bx=this.ballStartX,by=this.ballStartY;
+    const tx=this.hoopX+aim*this.hoopRadius*3;
+    const ty=this.hoopY;
+    const g=.35;
+    const T=Math.max(20,55-power*.3);
+    return{vx:(tx-bx)/T,vy:(ty-by)/T-.5*g*T};
+  }
+  holdStart(){
+    if(this.inFlight) return;
+    this.shooting=true;
+    this._si=setInterval(()=>{
+      if(!this.shooting) return;
+      this.power=Math.min(100,this.power+2.5);
+      const pct=this.power/100;
+      const col=pct<.45?'#ff4428':pct<.65?'#ffcc00':'#22c55e';
+      document.getElementById('power-fill').style.height=this.power+'%';
+      document.getElementById('power-fill').style.background=col;
+    },16);
+  }
+  holdEnd(){if(!this.shooting)return;this.shooting=false;clearInterval(this._si);this.shoot();}
+  shoot(){
+    if(this.inFlight||this.power<3){this.power=0;document.getElementById('power-fill').style.height='0%';return;}
+    const{vx,vy}=this._calcShot(this.power,this.aim);
+    this.ball.vx=vx; this.ball.vy=vy; this.inFlight=true; this.power=0;
+    document.getElementById('power-fill').style.height='0%';
+  }
+  moveAimLeft(){this.aim=Math.max(-1,this.aim-.08);this.updateAimCursor();}
+  moveAimRight(){this.aim=Math.min(1,this.aim+.08);this.updateAimCursor();}
+  updateAimCursor(){document.getElementById('aim-cursor').style.left=((this.aim+1)/2*100)+'%';}
+
+  draw(){
+    const W=this.W,H=this.H;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#0e0e18';ctx.fillRect(0,0,W,H);
+    // Court lines
+    ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.arc(W/2,H*.75,H*.12,0,Math.PI*2);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(0,H*.85);ctx.lineTo(W,H*.85);ctx.stroke();
+
+    // Player hoop
+    this._drawHoop(this.hoopX,this.hoopY,this.hoopRadius,'#cc4400','rgba(255,100,40,.8)',false);
+
+    // AI hoop (right side, blue)
+    if(this.cfg.oponent==='ai'){
+      const ax=W*.82,ay=H*.38,ar=Math.max(16,W*.05);
+      this._drawHoop(ax,ay,ar,'#1a4a8a','rgba(59,130,246,.6)',true);
+      ctx.font='bold 11px DM Sans,sans-serif';
+      ctx.fillStyle='rgba(59,130,246,.7)';ctx.textAlign='center';
+      ctx.fillText('AI',ax,ay-ar*1.9);ctx.textAlign='left';
+      // AI ball animation
+      if(this.aiBallAnim){
+        const p=this.aiBallAnim;
+        p.t+=.06;
+        if(p.t<1){
+          const bx2=p.sx+(ax-p.sx)*p.t;
+          const by2=p.sy+(ay-p.sy)*p.t-Math.sin(p.t*Math.PI)*40;
+          const g2=ctx.createRadialGradient(bx2-2,by2-2,1,bx2,by2,8);
+          g2.addColorStop(0,'#ff8c4a');g2.addColorStop(1,'#992200');
+          ctx.beginPath();ctx.arc(bx2,by2,8,0,Math.PI*2);ctx.fillStyle=g2;ctx.fill();
+        } else {
+          if(!p.scored){
+            p.scored=true; this.score2++; this.updateHUD();
+            const el=document.getElementById('hud-p2');
+            el.parentElement.classList.add('ai-scored');
+            setTimeout(()=>el.parentElement.classList.remove('ai-scored'),500);
+            for(let i=0;i<8;i++) this.spawnP(ax,ay,'rgba(59,130,246,.7)');
+          }
+          this.aiBallAnim=null;
+        }
+      }
+    }
+
+    // Trajectory preview
+    if(!this.inFlight&&this.power>5){
+      const{vx:pvx,vy:pvy}=this._calcShot(this.power,this.aim);
+      ctx.setLineDash([5,6]);ctx.strokeStyle='rgba(255,180,60,.4)';ctx.lineWidth=1.5;
+      ctx.beginPath();
+      let tx=this.ballStartX,ty2=this.ballStartY,tvx=pvx,tvy=pvy;
+      ctx.moveTo(tx,ty2);
+      for(let i=0;i<60;i++){tvy+=.35;tvx+=this.wind;tx+=tvx;ty2+=tvy;ctx.lineTo(tx,ty2);if(ty2>H)break;}
+      ctx.stroke();ctx.setLineDash([]);
+    }
+
+    // Particles
+    this.particles.forEach(p=>{
+      ctx.beginPath();ctx.arc(p.x,p.y,3,0,Math.PI*2);
+      ctx.fillStyle=p.color;ctx.globalAlpha=p.life/30;ctx.fill();
+    });
+    ctx.globalAlpha=1;
+
+    // Ball
+    if(this.ball){
+      const spin=this.inFlight?(performance.now()/200):0;
+      const bx=this.ball.x,by=this.ball.y,br=this.ballR;
+      ctx.save();ctx.translate(bx,by);ctx.rotate(spin);
+      const grd=ctx.createRadialGradient(-br*.3,-br*.3,br*.1,0,0,br);
+      grd.addColorStop(0,'#ff8c4a');grd.addColorStop(.6,'#cc4400');grd.addColorStop(1,'#992200');
+      ctx.beginPath();ctx.arc(0,0,br,0,Math.PI*2);ctx.fillStyle=grd;ctx.fill();
+      ctx.strokeStyle='rgba(0,0,0,.5)';ctx.lineWidth=1.5;ctx.stroke();
+      ctx.strokeStyle='rgba(0,0,0,.4)';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(-br,0);ctx.lineTo(br,0);ctx.stroke();
+      ctx.beginPath();ctx.arc(0,0,br*.6,0,Math.PI,false);ctx.stroke();
+      ctx.beginPath();ctx.arc(0,0,br*.6,Math.PI,Math.PI*2,false);ctx.stroke();
+      ctx.restore();
+    }
+    // Power ring
+    if(!this.inFlight&&this.power>0){
+      const r=this.ballR+8;
+      ctx.beginPath();ctx.arc(this.ballStartX,this.ballStartY,r,-Math.PI/2,-Math.PI/2+(this.power/100)*Math.PI*2);
+      const pct=this.power/100;
+      ctx.strokeStyle=pct<.45?'rgba(255,100,40,.7)':pct<.65?'rgba(255,200,40,.8)':'rgba(100,220,100,.8)';
+      ctx.lineWidth=4;ctx.stroke();
+    }
+  }
+
+  _drawHoop(hx,hy,hr,rimColor,rimColor2,blue){
+    // Backboard
+    ctx.fillStyle=blue?'#0e1a2e':'#1a1a2e';
+    ctx.strokeStyle=blue?'rgba(59,130,246,.2)':'rgba(255,255,255,.2)';
+    ctx.lineWidth=1.5;
+    ctx.fillRect(hx-hr*1.4,hy-hr*1.6,hr*2.8,hr*1.1);
+    ctx.strokeRect(hx-hr*1.4,hy-hr*1.6,hr*2.8,hr*1.1);
+    if(!blue){
+      ctx.strokeStyle='rgba(255,107,43,.5)';ctx.lineWidth=1;
+      ctx.strokeRect(hx-hr*.5,hy-hr*1.45,hr,hr*.7);
+    }
+    // Rim
+    ctx.beginPath();ctx.arc(hx,hy,hr,0,Math.PI*2);ctx.strokeStyle=rimColor;ctx.lineWidth=4;ctx.stroke();
+    ctx.beginPath();ctx.arc(hx,hy,hr,0,Math.PI*2);ctx.strokeStyle=rimColor2;ctx.lineWidth=2;ctx.stroke();
+    // Net
+    const npts=blue?6:8;
+    for(let i=0;i<npts;i++){
+      const a=(i/npts)*Math.PI*2;
+      ctx.beginPath();ctx.moveTo(hx+Math.cos(a)*hr,hy+Math.sin(a)*hr);ctx.lineTo(hx,hy+hr*1.4);
+      ctx.strokeStyle=blue?'rgba(100,160,255,.15)':'rgba(255,255,255,.2)';ctx.lineWidth=.8;ctx.stroke();
+    }
+    for(let i=0;i<3;i++){
+      ctx.beginPath();ctx.arc(hx,hy+hr*(.3+i*.35),hr*(.85-i*.25),0,Math.PI*2);
+      ctx.strokeStyle=blue?'rgba(100,160,255,.1)':'rgba(255,255,255,.1)';ctx.lineWidth=.8;ctx.stroke();
+    }
+  }
+}
+
+// ============================================================
+// START / END GAME
+// ============================================================
+function startGame(){
+  showScreen('game');resizeCanvas();
+  document.getElementById('hud-p2label').textContent=settings.oponent==='ai'?'AI':t('hud_you')+'2';
+  document.getElementById('hud-timer').style.color='var(--accent2)';
+  document.getElementById('mode-label').textContent=settings.mode.toUpperCase()+' · '+settings.diff.toUpperCase();
+  document.getElementById('wind-display').style.display=settings.mode==='chaos'?'':'none';
+  G=new GameState(settings);G.start();
+}
+
+function endGame(g){
+  const won=g.score1>g.score2;
+  const acc=g.shots>0?Math.round((g.shots-g.misses)/g.shots*100):0;
+  const xpE=won?60+g.perfects*5:20+g.perfects*3;
+  const cashE=won?100+g.score1*5:30;
+  const fansE=won?5+Math.floor(g.score1/2):1;
+  save.stats.games++;
+  if(won){save.stats.wins++;save.stats.streak++;}else{save.stats.losses++;save.stats.streak=0;}
+  if(save.stats.streak>save.stats.bestStreak) save.stats.bestStreak=save.stats.streak;
+  save.stats.baskets+=g.score1;save.stats.shots+=g.shots;save.stats.perfect+=g.perfects;
+  if(g.score1>save.stats.bestScore) save.stats.bestScore=g.score1;
+  if(g.bestCombo>save.stats.bestCombo) save.stats.bestCombo=g.bestCombo;
+  save.xp+=xpE;save.cash+=cashE;save.fans+=fansE;
+  save.energy=Math.max(0,save.energy-10);
+  while(save.xp>=xpNeeded(save.level)){save.xp-=xpNeeded(save.level);save.level++;showLevelUp(save.level);}
+  if(won){save.etapa++;if(save.etapa>10)save.etapa=1;}
+  save.leaderboard.push({name:lang==='en'?'You':'Tu',score:g.score1,isPlayer:true});
+  save.leaderboard.sort((a,b)=>b.score-a.score);
+  save.leaderboard=save.leaderboard.slice(0,10);
+  checkAchievements();checkChallenges();
+  if(window._tourneyRound!==undefined){
+    if(!save.turneu) save.turneu={round:0,results:[],active:false};
+    save.turneu.results[window._tourneyRound]={win:won};
+    if(won) save.turneu.round=window._tourneyRound+1;
+    if(won&&window._tourneyRound===3){save.cash+=800;save.fans+=120;toast('🏆 '+t('tur_done_msg')+' +$800',  'success');}
+    window._tourneyRound=undefined;
+  }
+  if(window._ligaGame){updateLigaAfterGame(won);window._ligaGame=false;}
+  persist();
+  document.getElementById('go-title').textContent=won?t('go_win'):t('go_loss');
+  document.getElementById('go-score').textContent=g.score1+'–'+g.score2;
+  document.getElementById('go-label').textContent=won?t('go_win_label'):t('go_loss_label');
+  document.getElementById('go-acc').textContent=acc+'%';
+  document.getElementById('go-combo').textContent=g.bestCombo;
+  document.getElementById('go-perfect').textContent=g.perfects;
+  document.getElementById('go-shots').textContent=g.shots;
+  document.getElementById('go-xp').textContent='+'+xpE+' XP';
+  document.getElementById('go-cash').textContent='+$'+cashE;
+  document.getElementById('go-fans').textContent='+'+fansE;
+  showScreen('gameover');
+}
+function showLevelUp(lvl){
+  const el=document.createElement('div');el.className='lup-overlay';
+  el.innerHTML=`<div class="lup-text">LEVEL UP!<br>LV.${lvl}</div>`;
+  document.body.appendChild(el);setTimeout(()=>el.remove(),1000);
+}
+
+// ============================================================
+// ACHIEVEMENTS
+// ============================================================
+const ACH_DEF=[
+  {id:'first_win',icon:'🏆',key:'ach_first_win',check:s=>s.stats.wins>=1},
+  {id:'10_wins',icon:'🎖️',key:'ach_10_wins',check:s=>s.stats.wins>=10},
+  {id:'50_baskets',icon:'🏀',key:'ach_50_baskets',check:s=>s.stats.baskets>=50},
+  {id:'combo_5',icon:'🔥',key:'ach_combo5',check:s=>s.stats.bestCombo>=5},
+  {id:'streak_3',icon:'💫',key:'ach_streak3',check:s=>s.stats.streak>=3},
+  {id:'perfect_5',icon:'✨',key:'ach_perfect5',check:s=>s.stats.perfect>=5},
+];
+const ACH_STRINGS={en:[
+  {name:'First win',desc:'Win your first match'},
+  {name:'Veteran',desc:'10 wins'},
+  {name:'Scorer',desc:'50 total baskets'},
+  {name:'Combo King',desc:'Best combo x5'},
+  {name:'En Fuego',desc:'3 consecutive wins'},
+  {name:'Perfectionist',desc:'5 perfect shots total'},
+],ro:[
+  {name:'Prima victorie',desc:'Câștigă primul meci'},
+  {name:'Veteran',desc:'10 victorii'},
+  {name:'Scorer',desc:'50 coșuri totale'},
+  {name:'Combo King',desc:'Best combo x5'},
+  {name:'En Fuego',desc:'3 victorii consecutive'},
+  {name:'Perfecționist',desc:'5 perfect shots total'},
+]};
+function checkAchievements(){
+  ACH_DEF.forEach((a,i)=>{
+    if(!save.achievements.includes(a.id)&&a.check(save)){
+      save.achievements.push(a.id);
+      toast('🏅 '+ACH_STRINGS[lang][i].name,'success');
+    }
+  });
+}
+
+// ============================================================
+// CAREER UI
+// ============================================================
+function updateCareerUI(){
+  document.getElementById('career-etapa').textContent=save.etapa;
+  document.getElementById('cs-games').textContent=save.stats.games;
+  document.getElementById('cs-wins').textContent=save.stats.wins;
+  document.getElementById('cs-baskets').textContent=save.stats.baskets;
+  document.getElementById('cs-wr').textContent=save.stats.games?Math.round(save.stats.wins/save.stats.games*100)+'%':'0%';
+  document.getElementById('cs-best').textContent=save.stats.bestScore;
+  document.getElementById('cs-streak').textContent=save.stats.bestStreak;
+  document.getElementById('cs-perfect').textContent=save.stats.perfect;
+  document.getElementById('cs-combo').textContent=save.stats.bestCombo;
+  document.getElementById('cs-cash').textContent='$'+save.cash;
+  document.getElementById('cs-fans').textContent=save.fans;
+  document.getElementById('cs-energy').textContent=save.energy;
+  document.getElementById('up-cash-disp').textContent='$'+save.cash;
+  document.getElementById('liga-sezon').textContent=save.season;
+  renderUpgrades();renderLeaderboard();renderAchievements();renderSeason();renderTurneu();renderLiga();renderProvocari();
+}
+
+const UPG=[
+  {id:'power',icon:'💪',key_name:'up_power',key_desc:'up_power_d',maxLvl:5,cost:l=>l*80},
+  {id:'window',icon:'🎯',key_name:'up_window',key_desc:'up_window_d',maxLvl:5,cost:l=>l*100},
+  {id:'wind',icon:'🌪️',key_name:'up_wind',key_desc:'up_wind_d',maxLvl:3,cost:l=>l*120},
+  {id:'stamina',icon:'⚡',key_name:'up_stamina',key_desc:'up_stamina_d',maxLvl:5,cost:l=>l*90},
+];
+const UPG_STR={en:[
+  {name:'Shot Power',desc:'Stronger throws'},
+  {name:'Perfect Window',desc:'Larger perfect zone'},
+  {name:'Wind Control',desc:'Resist wind in Chaos'},
+  {name:'Stamina',desc:'Energy drains slower'},
+],ro:[
+  {name:'Shot Power',desc:'Putere mai mare la aruncare'},
+  {name:'Perfect Window',desc:'Fereastră mai mare pentru perfect'},
+  {name:'Wind Control',desc:'Rezistență la vânt în Chaos'},
+  {name:'Stamina',desc:'Energie se consumă mai lent'},
+]};
+
+function renderUpgrades(){
+  const list=document.getElementById('upgrades-list');
+  list.innerHTML=UPG.map((u,i)=>{
+    const s=UPG_STR[lang][i];
+    const lvl=save.upgrades[u.id]||1;
+    const maxed=lvl>=u.maxLvl; const cost=u.cost(lvl);
+    const dots=Array.from({length:u.maxLvl},(_,j)=>`<div class="ldot ${j<lvl?'filled':''}"></div>`).join('');
+    return `<div class="upgrade-item">
+      <div class="up-icon">${u.icon}</div>
+      <div class="up-info"><div class="up-name">${s.name}</div><div class="up-desc">${s.desc}</div><div class="up-level">${dots}</div></div>
+      <button class="up-btn" ${maxed||save.cash<cost?'disabled':''} onclick="buyUpgrade('${u.id}')">
+        ${maxed?t('up_max'):'$'+cost}
+      </button>
+    </div>`;
+  }).join('');
+}
+function buyUpgrade(id){
+  const u=UPG.find(x=>x.id===id);const lvl=save.upgrades[id]||1;const cost=u.cost(lvl);
+  if(save.cash<cost){toast(lang==='en'?'Not enough cash!':'Nu ai suficient cash!','info');return;}
+  save.cash-=cost;save.upgrades[id]=lvl+1;persist();updateCareerUI();
+  toast('✅ '+UPG_STR[lang][UPG.indexOf(u)].name+' → Lv.'+save.upgrades[id],'success');
+}
+
+function renderLeaderboard(){
+  const list=document.getElementById('lb-list');
+  list.innerHTML=save.leaderboard.slice(0,8).map((e,i)=>`
+    <div class="lb-row ${e.isPlayer?'lb-highlight':''}">
+      <div class="lb-rank">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div>
+      <div class="lb-name">${e.name}${e.isPlayer?' ('+( lang==='en'?'you':'tu')+')':''}</div>
+      <div class="lb-score">${e.score}</div>
+    </div>`).join('');
+}
+
+function renderAchievements(){
+  const list=document.getElementById('ach-list');
+  list.innerHTML=ACH_DEF.map((a,i)=>{
+    const s=ACH_STRINGS[lang][i];const unlocked=save.achievements.includes(a.id);
+    return `<div class="ach-item">
+      <div class="ach-icon ${unlocked?'unlocked':''}">${a.icon}</div>
+      <div class="ach-info"><div class="ach-name">${s.name}</div><div class="ach-desc">${s.desc}</div></div>
+      <div class="ach-badge ${unlocked?'unlocked':''}">${unlocked?t('ach_unlocked'):t('ach_locked')}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderSeason(){
+  const list=document.getElementById('season-list');
+  const prog=((save.etapa-1)/10)*100;
+  const pu=save.etapa>10&&save.fans>=250;
+  const seasonLabel=lang==='en'?`Season ${save.season} · Stage ${save.etapa}/10`:`Sezon ${save.season} · Etapa ${save.etapa}/10`;
+  list.innerHTML=`
+    <div class="season-card">
+      <div class="season-title">${seasonLabel}</div>
+      <div class="season-bar"><div class="season-fill" style="width:${Math.min(prog,100)}%"></div></div>
+      <div class="season-meta"><span>${lang==='en'?'Stage':'Etapa'} ${save.etapa}</span><span>${Math.round(prog)}%</span></div>
+    </div>
+    <div class="season-card">
+      <div class="season-title">🏆 Playoff</div>
+      <div class="season-meta" style="margin-top:7px">
+        <span style="color:${pu?'var(--green)':'var(--text3)'}">${pu?t('playoff_unlocked'):t('playoff_locked')}</span>
+        <span>${t('fans_label')} ${save.fans}/250</span>
+      </div>
+    </div>`;
+}
+
+// ============================================================
+// TOURNAMENT
+// ============================================================
+function renderTurneu(){
+  const el=document.getElementById('turneu-list');
+  if(!save.turneu) save.turneu={round:0,results:[],active:false};
+  const tt=save.turneu;
+  const unlocked=save.fans>=50||save.stats.wins>=3;
+  if(!unlocked){
+    el.innerHTML=`<div class="season-card"><div class="season-title">${t('tur_locked')}</div><div class="season-meta" style="margin-top:7px"><span>${t('tur_locked_desc')}</span></div></div>`;return;
+  }
+  const rounds=t('tur_rounds'); const opp=t('tur_oponents');
+  let html='<div style="display:flex;flex-direction:column;gap:7px">';
+  rounds.forEach((r,i)=>{
+    const res=tt.results[i];
+    const state=res?'done':(i===tt.round?'active':'locked');
+    const resultHtml=res?`<span class="bracket-result ${res.win?'win':'loss'}">${res.win?'✓ WIN':'✗ LOSS'}</span>`
+      :(state==='active'?`<button class="up-btn" onclick="startTourneyMatch(${i})">${t('tur_play')}</button>`:'<span style="color:var(--text3);font-size:.75rem">🔒</span>');
+    html+=`<div class="bracket-round ${state}">
+      <div><div class="bracket-label">${r}</div><div class="bracket-vs">vs ${opp[i]}</div></div>
+      ${resultHtml}
+    </div>`;
+  });
+  if(tt.results.length===4){
+    const wins=tt.results.filter(r=>r.win).length;
+    html+=`<div class="season-card" style="margin-top:7px;border-color:var(--gold)">
+      <div class="season-title" style="color:var(--gold)">🏆 ${t('tur_done_msg')} — ${wins}/4</div>
+      <div class="season-meta" style="margin-top:7px"><span>${t('tur_prize')} $${wins*200}</span>
+      <button class="up-btn" onclick="resetTurneu()">${t('tur_new')}</button></div></div>`;
+  }
+  html+='</div>';
+  el.innerHTML=html;
+}
+function startTourneyMatch(round){
+  settings.diff=['easy','normal','hard','pro'][round];
+  settings.mode='classic';settings.oponent='ai';settings.time=45;
+  window._tourneyRound=round;
+  document.getElementById('modal-settings').classList.remove('open');
+  showScreen('game');startGame();
+}
+function resetTurneu(){save.turneu={round:0,results:[],active:false};persist();renderTurneu();}
+
+// ============================================================
+// LEAGUE
+// ============================================================
+function renderLiga(){
+  if(!save.liga) save.liga=defaultSave().liga;
+  const table=[...save.liga.table].sort((a,b)=>b.pts-a.pts);
+  const el=document.getElementById('liga-list');
+  el.innerHTML=table.map((row,i)=>`
+    <div class="league-row ${row.isPlayer?'player-row':''}">
+      <div class="league-pos">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div>
+      <div class="league-name">${row.name}${row.isPlayer?' 👤':''}</div>
+      <div class="league-stat">${row.w}</div>
+      <div class="league-stat">${row.l}</div>
+      <div class="league-pts">${row.pts}</div>
+    </div>`).join('')
+  +`<div style="margin-top:11px"><button class="mbtn mbtn-sec" style="width:100%" onclick="startLigaMatch()">⚽ ${t('lig_play')}</button></div>`;
+}
+function startLigaMatch(){settings.mode='classic';settings.oponent='ai';settings.time=60;window._ligaGame=true;showScreen('game');startGame();}
+function updateLigaAfterGame(won){
+  if(!save.liga) save.liga=defaultSave().liga;
+  const player=save.liga.table.find(r=>r.isPlayer);
+  if(player){if(won){player.w++;player.pts+=3;}else player.l++;}
+  save.liga.table.forEach(r=>{if(!r.isPlayer&&Math.random()<.4){const w2=Math.random()<.5;if(w2){r.w++;r.pts+=3;}else r.l++;}});
+}
+
+// ============================================================
+// CHALLENGES
+// ============================================================
+const CHALL_IDS=['d_5shots','d_perfect3','d_win2','w_50baskets','w_combo8','w_winrate'];
+function getChallProg(i){
+  const st=save.stats;
+  if(i===0) return 0; // per-match, tracked separately
+  if(i===1) return 0;
+  if(i===2) return Math.min(2,st.streak);
+  if(i===3) return Math.min(50,st.baskets);
+  if(i===4) return Math.min(8,st.bestCombo);
+  if(i===5) return Math.min(6,st.games>=10?Math.round(st.wins/st.games*10):0);
+  return 0;
+}
+function renderProvocari(){
+  if(!save.provocari) save.provocari={};
+  const defs=t('chall_defs'); const rews=t('chall_rewards'); const types=t('chall_types');
+  const goals=[5,3,2,50,8,6];
+  const el=document.getElementById('provocari-list');
+  const daily=defs.slice(0,3); const weekly=defs.slice(3);
+  const renderGroup=(items,startIdx,groupLabel)=>`
+    <div class="sec-label" style="margin-top:${startIdx===0?'0':'.9rem'}">${groupLabel}</div>
+    ${items.map((c,j)=>{
+      const i=startIdx+j; const done=save.provocari[CHALL_IDS[i]];
+      const prog=done?goals[i]:getChallProg(i); const pct=Math.round(prog/goals[i]*100);
+      return `<div class="chall-item ${done?'done':''}">
+        <div class="chall-header"><span class="chall-icon">${['🏀','✨','🔥','🎯','💥','📈'][i]}</span>
+          <span class="chall-name">${c.name}</span><span class="chall-rew">${rews[i]}</span></div>
+        <div class="chall-desc">${c.desc}</div>
+        <div class="chall-bar"><div class="chall-fill" style="width:${pct}%"></div></div>
+        <div class="chall-prog">${prog}/${goals[i]} ${done?t('ch_done'):''}</div>
+      </div>`;
+    }).join('')}`;
+  el.innerHTML=renderGroup(daily,0,types[0])+renderGroup(weekly,3,types[3]);
+}
+function checkChallenges(){
+  if(!save.provocari) save.provocari={};
+  const goals=[5,3,2,50,8,6];
+  CHALL_IDS.forEach((id,i)=>{
+    if(!save.provocari[id]&&getChallProg(i)>=goals[i]){
+      save.provocari[id]=true;
+      toast('⚡ '+(t('chall_defs')[i]||{name:id}).name,'success');
+    }
+  });
+}
+
+// ============================================================
+// CAREER TABS
+// ============================================================
+document.querySelectorAll('.ctab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.ctab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.cpanel').forEach(x=>x.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
+  });
+});
+document.getElementById('career-back').addEventListener('click',()=>showScreen('menu'));
+
+// ============================================================
+// GAME OVER BUTTONS
+// ============================================================
+document.getElementById('go-menu').addEventListener('click',()=>showScreen('menu'));
+document.getElementById('go-replay').addEventListener('click',()=>startGame());
+
+// ============================================================
+// SHOOT
+// ============================================================
+const shootBtn=document.getElementById('shoot-btn');
+shootBtn.addEventListener('mousedown',()=>G&&G.holdStart());
+shootBtn.addEventListener('mouseup',()=>G&&G.holdEnd());
+shootBtn.addEventListener('touchstart',e=>{e.preventDefault();G&&G.holdStart();},{passive:false});
+shootBtn.addEventListener('touchend',e=>{e.preventDefault();G&&G.holdEnd();},{passive:false});
+
+// ============================================================
+// MOBILE AIM — swipe + buttons
+// ============================================================
+let touchStartX=null;
+canvas.addEventListener('touchstart',e=>{if(e.touches.length===1) touchStartX=e.touches[0].clientX;},{passive:true});
+canvas.addEventListener('touchmove',e=>{
+  if(!G||!G.running||G.paused||touchStartX===null) return;
+  const dx=e.touches[0].clientX-touchStartX;
+  if(Math.abs(dx)>5){G.aim=Math.max(-1,Math.min(1,G.aim+dx*.003));G.updateAimCursor();touchStartX=e.touches[0].clientX;}
+},{passive:true});
+canvas.addEventListener('touchend',()=>{touchStartX=null;},{passive:true});
+
+let aimInterval=null;
+function startAimHold(dir){
+  if(G) G[dir==='left'?'moveAimLeft':'moveAimRight']();
+  aimInterval=setInterval(()=>{if(G)G[dir==='left'?'moveAimLeft':'moveAimRight']();},80);
+}
+function stopAimHold(){clearInterval(aimInterval);aimInterval=null;}
+['aim-left-btn','aim-right-btn'].forEach(id=>{
+  const btn=document.getElementById(id);const dir=id.includes('left')?'left':'right';
+  btn.addEventListener('touchstart',e=>{e.preventDefault();startAimHold(dir);},{passive:false});
+  btn.addEventListener('touchend',e=>{e.preventDefault();stopAimHold();},{passive:false});
+  btn.addEventListener('mousedown',()=>startAimHold(dir));
+});
+document.addEventListener('mouseup',stopAimHold);
+
+// ============================================================
+// KEYBOARD
+// ============================================================
+const keys={};
+document.addEventListener('keydown',e=>{
+  keys[e.code]=true;
+  if(!G||!G.running||G.paused) return;
+  if(e.code==='Space'&&!e.repeat){e.preventDefault();G.holdStart();}
+  if(e.code==='KeyA'||e.code==='ArrowLeft') G.moveAimLeft();
+  if(e.code==='KeyD'||e.code==='ArrowRight') G.moveAimRight();
+  if(e.code==='KeyP'||e.code==='Escape'){G.paused=!G.paused;document.getElementById('btn-pause').textContent=G.paused?'▶':'⏸';}
+});
+document.addEventListener('keyup',e=>{keys[e.code]=false;if(!G)return;if(e.code==='Space')G.holdEnd();});
+setInterval(()=>{if(!G||!G.running||G.paused)return;if(keys.KeyA||keys.ArrowLeft)G.moveAimLeft();if(keys.KeyD||keys.ArrowRight)G.moveAimRight();},50);
+
+// ============================================================
+// PAUSE / FULLSCREEN
+// ============================================================
+document.getElementById('btn-pause').addEventListener('click',()=>{
+  if(!G)return;G.paused=!G.paused;document.getElementById('btn-pause').textContent=G.paused?'▶':'⏸';
+});
+document.getElementById('btn-fullscreen').addEventListener('click',()=>{
+  if(document.fullscreenElement)document.exitFullscreen();
+  else document.documentElement.requestFullscreen().catch(()=>{});
+});
+
+// ============================================================
+// SOUND
+// ============================================================
+let audioCtx=null;
+function getAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
+function playSound(type){
+  try{
+    const ac=getAudio();const osc=ac.createOscillator();const gain=ac.createGain();
+    osc.connect(gain);gain.connect(ac.destination);
+    if(type==='score'){osc.frequency.setValueAtTime(440,ac.currentTime);osc.frequency.linearRampToValueAtTime(880,ac.currentTime+.1);gain.gain.setValueAtTime(.15,ac.currentTime);gain.gain.linearRampToValueAtTime(0,ac.currentTime+.2);}
+    else if(type==='perfect'){osc.frequency.setValueAtTime(660,ac.currentTime);osc.frequency.linearRampToValueAtTime(1320,ac.currentTime+.15);gain.gain.setValueAtTime(.2,ac.currentTime);gain.gain.linearRampToValueAtTime(0,ac.currentTime+.3);}
+    else if(type==='miss'){osc.frequency.setValueAtTime(220,ac.currentTime);osc.frequency.linearRampToValueAtTime(110,ac.currentTime+.15);gain.gain.setValueAtTime(.1,ac.currentTime);gain.gain.linearRampToValueAtTime(0,ac.currentTime+.2);}
+    osc.start();osc.stop(ac.currentTime+.35);
+  }catch(e){}
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+let toastTimer=null;
+function toast(msg,type='info'){
+  const el=document.getElementById('toast');el.textContent=msg;
+  el.className='toast show '+type;clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+resizeCanvas();
+applyLang();
+if(!save.firstTime) updateMenuUI();
+</script>
+</body>
+</html>
 
