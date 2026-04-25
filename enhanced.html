@@ -14,7 +14,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=real-1" />
+  <link rel="stylesheet" href="styles.css?v=cover-1" />
+  <link rel="stylesheet" href="cover-scene.css?v=cover-1" />
 </head>
 <body>
   <div class="court-glow" aria-hidden="true"></div>
@@ -30,6 +31,27 @@
 
   <main class="app-shell">
     <section class="hero-panel" id="homeScreen">
+      <div class="cover-scene" aria-label="Basket vs AI cover artwork">
+        <div class="cover-skyline"></div>
+        <div class="cover-crowd"></div>
+        <div class="cover-hoop"></div>
+        <div class="cover-player" aria-hidden="true">
+          <div class="ball-flame"></div><div class="cover-ball"></div>
+          <div class="player-hair"></div><div class="player-head"></div>
+          <div class="player-arm left"></div><div class="player-arm right"></div>
+          <div class="player-leg one"></div><div class="player-leg two"></div>
+        </div>
+        <div class="cover-ai" aria-hidden="true">
+          <div class="robot-head"><span class="robot-eye one"></span><span class="robot-eye two"></span></div>
+          <div class="robot-body"></div>
+          <div class="robot-arm left"></div><div class="robot-arm right"></div>
+          <div class="robot-leg one"></div><div class="robot-leg two"></div>
+        </div>
+        <div class="cover-title"><strong>BASKET</strong><span>VS <b>AI</b></span></div>
+        <div class="cover-tag">Career 3.0</div>
+        <div class="cover-sub">Beat the AI, earn <em>XP</em>, buy <b>upgrades</b>, conquer the league.</div>
+      </div>
+
       <p class="eyebrow" data-i18n="eyebrow">Career arcade basketball</p>
       <h1 data-i18n="heroTitle">Beat the AI. Build your legend.</h1>
       <p class="hero-copy" data-i18n="heroCopy">A faster, cleaner version of Basket vs AI with polished visuals, responsive controls, career rewards, and a clearer portfolio-ready structure.</p>
@@ -132,8 +154,8 @@
   </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="script.js?v=real-1" defer></script>
-  <script src="realistic-graphics.js?v=real-1" defer></script>
-  <script src="i18n-fix.js?v=real-1" defer></script>
+  <script src="script.js?v=cover-1" defer></script>
+  <script src="realistic-graphics.js?v=cover-1" defer></script>
+  <script src="i18n-fix.js?v=cover-1" defer></script>
 </body>
 </html>
