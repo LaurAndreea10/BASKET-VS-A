@@ -5,23 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Basket vs AI is a responsive browser basketball arcade game with AI matches, career progression, upgrades, achievements, and mobile-friendly controls." />
   <meta name="theme-color" content="#0a0a0f" />
-  <meta property="og:title" content="Basket vs AI — Arcade Basketball Career Game" />
-  <meta property="og:description" content="Play quick basketball matches, beat the AI, upgrade your player, and build your career in a responsive HTML5 canvas game." />
+  <meta property="og:title" content="🏀 Basket vs AI — Career 3.0" />
+  <meta property="og:description" content="Beat the AI, earn XP, buy upgrades and conquer the league." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://laurandreea10.github.io/BASKET-VS-AI/enhanced.html" />
+  <meta property="og:image" content="https://laurandreea10.github.io/BASKET-VS-AI/og-cover.svg" />
   <meta name="twitter:card" content="summary_large_image" />
-  <title>🏀 Basket vs AI — Enhanced Career</title>
+  <meta name="twitter:image" content="https://laurandreea10.github.io/BASKET-VS-AI/og-cover.svg" />
+  <title>🏀 Basket vs AI — Career 3.0</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=cover-1" />
-  <link rel="stylesheet" href="cover-scene.css?v=cover-1" />
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Mono:wght@400;700&family=Syne:wght@600;700;800&family=Bebas+Neue&family=DM+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=assets-1" />
+  <link rel="stylesheet" href="cover-scene.css?v=assets-1" />
 </head>
 <body>
   <div class="court-glow" aria-hidden="true"></div>
 
   <header class="topbar">
-    <a class="brand" href="./enhanced.html" aria-label="Basket vs AI home">🏀 <span>Basket vs AI</span></a>
+    <a class="brand" href="./enhanced.html" aria-label="Basket vs AI home"><img src="logo.svg" alt="Basket vs AI" class="nav-logo" /></a>
     <nav class="top-actions" aria-label="Quick actions">
       <button class="ghost-btn" id="langToggle" type="button" aria-label="Change language">RO</button>
       <button class="ghost-btn" id="openHelpBtn" type="button" data-i18n="howToPlay">How to play</button>
@@ -31,25 +34,8 @@
 
   <main class="app-shell">
     <section class="hero-panel" id="homeScreen">
-      <div class="cover-scene" aria-label="Basket vs AI cover artwork">
-        <div class="cover-skyline"></div>
-        <div class="cover-crowd"></div>
-        <div class="cover-hoop"></div>
-        <div class="cover-player" aria-hidden="true">
-          <div class="ball-flame"></div><div class="cover-ball"></div>
-          <div class="player-hair"></div><div class="player-head"></div>
-          <div class="player-arm left"></div><div class="player-arm right"></div>
-          <div class="player-leg one"></div><div class="player-leg two"></div>
-        </div>
-        <div class="cover-ai" aria-hidden="true">
-          <div class="robot-head"><span class="robot-eye one"></span><span class="robot-eye two"></span></div>
-          <div class="robot-body"></div>
-          <div class="robot-arm left"></div><div class="robot-arm right"></div>
-          <div class="robot-leg one"></div><div class="robot-leg two"></div>
-        </div>
-        <div class="cover-title"><strong>BASKET</strong><span>VS <b>AI</b></span></div>
-        <div class="cover-tag">Career 3.0</div>
-        <div class="cover-sub">Beat the AI, earn <em>XP</em>, buy <b>upgrades</b>, conquer the league.</div>
+      <div class="official-cover-card">
+        <img src="og-cover.svg" alt="Basket vs AI Career 3.0 cover" class="official-cover" />
       </div>
 
       <p class="eyebrow" data-i18n="eyebrow">Career arcade basketball</p>
@@ -154,8 +140,8 @@
   </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="script.js?v=cover-1" defer></script>
-  <script src="realistic-graphics.js?v=cover-1" defer></script>
-  <script src="i18n-fix.js?v=cover-1" defer></script>
+  <script src="script.js?v=assets-1" defer></script>
+  <script src="realistic-graphics.js?v=assets-1" defer></script>
+  <script src="i18n-fix.js?v=assets-1" defer></script>
 </body>
 </html>
