@@ -4,19 +4,27 @@
   function loadPolishLayer() {
     const cssId = 'gameplay-polish-css';
     const jsId = 'gameplay-polish-js';
+    const rendererId = 'canvas-render-v2-js';
     if (!document.getElementById(cssId)) {
       const link = document.createElement('link');
       link.id = cssId;
       link.rel = 'stylesheet';
-      link.href = 'gameplay-polish.css?v=assets-4';
+      link.href = 'gameplay-polish.css?v=assets-5';
       document.head.appendChild(link);
     }
     if (!document.getElementById(jsId)) {
       const script = document.createElement('script');
       script.id = jsId;
-      script.src = 'gameplay-polish.js?v=assets-4';
+      script.src = 'gameplay-polish.js?v=assets-5';
       script.defer = true;
       document.body.appendChild(script);
+    }
+    if (!document.getElementById(rendererId)) {
+      const renderer = document.createElement('script');
+      renderer.id = rendererId;
+      renderer.src = 'canvas-render-v2.js?v=assets-5';
+      renderer.defer = true;
+      document.body.appendChild(renderer);
     }
   }
 
