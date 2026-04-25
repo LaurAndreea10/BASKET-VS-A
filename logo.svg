@@ -1,0 +1,27 @@
+<svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffae00"/>
+      <stop offset="100%" stop-color="#ff6a1f"/>
+    </linearGradient>
+    <filter id="g"><feGaussianBlur stdDeviation="2"/></filter>
+  </defs>
+  <rect width="600" height="300" fill="#0a0a14"/>
+  <text x="300" y="100" text-anchor="middle"
+        font-family="'Bungee',sans-serif" font-size="78" fill="#ffffff" letter-spacing="-2">BASKET</text>
+  <g transform="translate(300 150)">
+    <circle r="38" fill="url(#lg)"/>
+    <g stroke="#3a0e00" stroke-width="2.5" fill="none">
+      <circle r="38"/>
+      <line x1="-38" y1="0" x2="38" y2="0"/>
+      <path d="M0 -38 Q 11 0 0 38"/>
+      <path d="M0 -38 Q -11 0 0 38"/>
+    </g>
+    <text x="0" y="6" text-anchor="middle" font-family="'Bungee',sans-serif"
+          font-size="20" fill="#00f0ff" filter="url(#g)">VS</text>
+  </g>
+  <text x="300" y="230" text-anchor="middle"
+        font-family="'Bungee',sans-serif" font-size="78" fill="#ff6a1f" letter-spacing="-2">A.I.</text>
+  <text x="300" y="270" text-anchor="middle" font-family="'Space Mono',monospace"
+        font-size="13" fill="#9b9bb5" letter-spacing="6">CAREER · 3.0</text>
+</svg>
