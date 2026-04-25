@@ -1,70 +1,54 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="description" content="Basket vs AI Enhanced Pro Stable is a responsive arcade basketball game with no-stick physics, aim control, career, shop, leaderboard and competitions." />
-  <meta name="theme-color" content="#050814" />
-  <meta property="og:title" content="🏀 Basket vs AI — Enhanced Pro Stable" />
-  <meta property="og:description" content="Stable RO/EN basketball arcade game with clean mobile physics and career progression." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://laurandreea10.github.io/BASKET-VS-AI/enhanced.html" />
-  <meta property="og:image" content="https://laurandreea10.github.io/BASKET-VS-AI/og-cover.svg" />
-  <title>🏀 Basket vs AI — Enhanced Pro Stable</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=stable-3" />
-  <link rel="stylesheet" href="stability.css?v=stable-3" />
-  <link rel="stylesheet" href="player-customizer.css?v=stable-3" />
-  <link rel="stylesheet" href="cover-scene.css?v=assets-1" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0b0d12" />
+<title>🏀 Basket vs AI — Enhanced Pro</title>
+<meta name="description" content="Baschet arcade premium: țintire și putere separate, bank shots, turneu, ligă și provocări zilnice. Construiește-ți legenda." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="enhanced-pro.css?v=pro-1">
 </head>
-<body>
-  <div class="court-glow" aria-hidden="true"></div>
-  <header class="topbar">
-    <a class="brand" href="./enhanced.html" aria-label="Basket vs AI home"><img src="logo.svg" alt="Basket vs AI" class="nav-logo" /><span>Stable</span></a>
-    <nav class="top-actions" aria-label="Quick actions">
-      <button class="ghost-btn" id="soundBtn" type="button" data-i18n="sound">Sunet</button>
-      <button class="ghost-btn" id="langToggle" type="button" aria-label="Change language">EN</button>
-      <button class="ghost-btn" id="openHelpBtn" type="button" data-i18n="howToPlay">Cum se joacă</button>
-      <button class="ghost-btn danger" id="resetBtn" type="button" data-i18n="reset">Resetare</button>
-    </nav>
-  </header>
-  <main class="app-shell" id="appShell">
-    <section class="hero-panel" id="homeScreen">
-      <div class="official-cover-card"><img src="og-cover.svg" alt="Basket vs AI Enhanced Pro cover" class="official-cover" /></div>
-      <p class="eyebrow" data-i18n="eyebrow">Baschet arcade îmbunătățit</p>
-      <h1 data-i18n="heroTitle">Învinge AI-ul. Construiește-ți legenda.</h1>
-      <p class="hero-copy" data-i18n="heroCopy">Enhanced Pro stabil: țintire și putere separate, fizică fără blocaje, carieră, shop și competiții.</p>
-      <div class="player-card"><div class="avatar" aria-hidden="true">🔥</div><div><strong id="playerRank">Rookie</strong><span id="careerMeta">Nivel 1 · 0 XP · 0 fani</span><div class="xp-track" aria-label="XP progress"><div id="xpFill" class="xp-fill"></div></div></div></div>
-      <div class="hero-actions"><button class="primary-btn" id="playBtn" type="button" data-i18n="playMatch">▶ Joacă meci</button><button class="secondary-btn" id="careerBtn" type="button" data-i18n="openHub">🏆 Deschide hub</button></div>
-      <div class="mode-grid" aria-label="Match settings">
-        <label><span data-i18n="mode">Mod</span><select id="modeSelect"><option value="classic" data-i18n="classic">Clasic</option><option value="blitz" data-i18n="blitz">Blitz</option><option value="moving" data-i18n="moving">Coș mobil</option><option value="chaos" data-i18n="chaos">Vânt haotic</option><option value="bank" data-i18n="bankMode">Bank lab</option></select></label>
-        <label><span data-i18n="difficulty">Dificultate</span><select id="difficultySelect"><option value="easy" data-i18n="easy">Ușor</option><option value="normal" selected data-i18n="normal">Normal</option><option value="hard" data-i18n="hard">Greu</option><option value="pro" data-i18n="pro">Pro</option></select></label>
-        <label><span data-i18n="time">Timp</span><select id="timeSelect"><option value="30">30s</option><option value="60" selected>60s</option><option value="90">90s</option></select></label>
-      </div>
-    </section>
-    <section class="game-panel hidden" id="gameScreen" aria-label="Basketball match">
-      <div class="scoreboard advanced-scoreboard"><div class="score-card"><span data-i18n="you">Tu</span><strong id="youScore">0</strong></div><div class="timer score-card"><span id="modeLabel">Clasic · Normal</span><strong id="timer">60</strong></div><div class="score-card"><span>AI</span><strong id="aiScore">0</strong></div></div>
-      <div class="match-stats" aria-label="Match stats"><span><b id="perfectShotsStat">0</b> <em data-i18n="perfectShots">Perfecte</em></span><span><b id="rimHitsStat">0</b> <em data-i18n="rimHits">Inel</em></span><span><b id="bankShotsStat">0</b> <em data-i18n="bankShots">Bank</em></span><span><b id="comboStat">0</b> <em data-i18n="combo">Combo</em></span></div>
-      <div class="assist-panel"><div class="wind-chip" id="windChip">💨 0</div><div class="assist-track" aria-label="Perfect shot assist"><span data-i18n="perfectAssist">Asistență perfectă</span><div class="assist-bar"><i class="assist-zone weak"></i><i class="assist-zone good"></i><i class="assist-zone perfect"></i><i class="assist-zone strong"></i><b id="assistNeedle"></b></div><small id="assistLabel">Arc bun</small></div><div class="speed-chip"><span data-i18n="ballSpeed">Viteză minge</span> <b id="speedStat">0</b></div></div>
-      <canvas id="gameCanvas" width="900" height="620" aria-label="Basketball court canvas"></canvas>
-      <div class="mobile-hint" id="shotHint" data-i18n="shotHint">Țintește, ține apăsat pentru putere, eliberează lângă zona aurie.</div>
-      <div class="controls"><button class="aim-btn" id="leftBtn" type="button" aria-label="Aim left">◀</button><label class="aim-slider-wrap"><span data-i18n="aimControl">Control țintă</span><input id="aimSlider" type="range" min="-100" max="100" value="0" /></label><div class="power-wrap" aria-label="Shot power"><span data-i18n="power">Putere</span><div class="power-track"><div id="powerFill" class="power-fill"></div></div></div><button class="shoot-btn" id="shootBtn" type="button" data-i18n="shoot">ARUNCĂ</button><button class="aim-btn" id="rightBtn" type="button" aria-label="Aim right">▶</button></div>
-      <button class="secondary-btn small" id="quitBtn" type="button" data-i18n="exitMatch">Ieși din meci</button>
-    </section>
-    <aside class="career-panel hidden" id="careerScreen">
-      <div class="panel-head"><h2 data-i18n="hubTitle">Hub jucător</h2><button class="ghost-btn" id="closeCareerBtn" type="button" data-i18n="close">Închide</button></div>
-      <div class="tabs" role="tablist" aria-label="Player hub tabs"><button class="tab active" type="button" data-tab="career" data-i18n="career">Carieră</button><button class="tab" type="button" data-tab="shop" data-i18n="shop">Shop</button><button class="tab" type="button" data-tab="leaderboard" data-i18n="leaderboard">Clasament</button><button class="tab" type="button" data-tab="competitions" data-i18n="competitions">Competiții</button></div>
-      <section class="tab-section active" id="tab-career"><div class="stats-grid"><article><span data-i18n="level">Nivel</span><strong id="statLevel">1</strong></article><article><span data-i18n="cash">Bani</span><strong id="statCash">0</strong></article><article><span data-i18n="fans">Fani</span><strong id="statFans">0</strong></article><article><span data-i18n="bestScore">Cel mai bun scor</span><strong id="statBest">0</strong></article><article><span data-i18n="perfectShots">Perfecte</span><strong id="careerPerfectShots">0</strong></article><article><span data-i18n="rimHits">Inel</span><strong id="careerRimHits">0</strong></article><article><span data-i18n="bankShots">Bank</span><strong id="careerBankShots">0</strong></article><article><span data-i18n="bestCombo">Cel mai bun combo</span><strong id="careerBestCombo">0</strong></article></div><h3 data-i18n="achievements">Realizări</h3><div class="achievement-list" id="achievementList"></div></section>
-      <section class="tab-section" id="tab-shop"><h3 data-i18n="upgrades">Îmbunătățiri</h3><div class="upgrade-list" id="upgradeList"></div></section>
-      <section class="tab-section" id="tab-leaderboard"><h3 data-i18n="leaderboard">Clasament</h3><div class="leaderboard-list" id="leaderboardList"></div></section>
-      <section class="tab-section" id="tab-competitions"><h3 data-i18n="competitions">Competiții</h3><div class="competition-list" id="competitionList"></div></section>
-    </aside>
-  </main>
-  <dialog class="help-dialog" id="helpDialog"><form method="dialog"><button class="dialog-close" aria-label="Close help">×</button><h2 data-i18n="howToPlay">Cum se joacă</h2><ul><li data-i18n="helpDesktop"><strong>Desktop:</strong> A/D sau săgeți pentru țintire, Space pentru putere.</li><li data-i18n="helpAim">Țintirea este separată de putere.</li><li data-i18n="helpBank">Bank mode oferă bonus când țintești larg.</li><li data-i18n="helpMobile"><strong>Mobil:</strong> folosește sliderul și ține apăsat ARUNCĂ.</li><li data-i18n="helpRewards">Victoriile oferă XP, bani și fani.</li></ul></form></dialog>
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="enhanced-stable.js?v=stable-3" defer></script>
+<body data-lang="ro" data-theme="dark">
+<header class="topbar">
+  <a class="brand" href="./"><span class="brand-mark">🏀</span><span class="brand-text"><strong>Basket<span>vs</span>AI</strong><em>Enhanced Pro</em></span></a>
+  <nav class="topbar-actions">
+    <button class="iconbtn" id="btn-sound" title="Sunet" aria-pressed="true">♪</button>
+    <button class="iconbtn" id="btn-lang" title="Limbă"><span id="lang-label">EN</span></button>
+    <button class="iconbtn" id="btn-help" title="Cum se joacă">?</button>
+    <button class="iconbtn warn" id="btn-reset" title="Resetare">⟲</button>
+  </nav>
+</header>
+<section class="hero" id="hero">
+  <div class="hero-grid">
+    <div class="hero-copy">
+      <span class="eyebrow"><span class="dot"></span><span data-i18n="hero.eyebrow">Baschet arcade premium</span></span>
+      <h1 class="display" data-i18n="hero.title">Învinge AI-ul. Construiește-ți legenda</h1>
+      <p class="lede" data-i18n="hero.lede">Țintire și putere separate, bank shots, perfect-shot assist, turneu, ligă și provocări zilnice. O experiență stabilă, fără blocaje, optimizată pentru telefon și desktop.</p>
+      <div class="hero-cta"><button class="btn primary" id="btn-play" data-i18n="hero.play">▶ Joacă meci</button><button class="btn ghost" id="btn-hub" data-i18n="hero.hub">🏆 Deschide hub</button></div>
+      <ul class="hero-stats"><li><span class="k">Nivel</span><strong id="hs-level">1</strong></li><li><span class="k">XP</span><strong id="hs-xp">0</strong></li><li><span class="k">Fani</span><strong id="hs-fans">0</strong></li><li><span class="k">Best</span><strong id="hs-best">0</strong></li></ul>
+    </div>
+    <div class="hero-art"><canvas id="cover" width="640" height="520"></canvas></div>
+  </div>
+</section>
+<section class="setup" aria-label="Configurare meci">
+  <div class="setup-row">
+    <fieldset class="chipset"><legend>Mod</legend><label><input type="radio" name="mode" value="classic" checked><span>Clasic</span></label><label><input type="radio" name="mode" value="blitz"><span>Blitz</span></label><label><input type="radio" name="mode" value="moving"><span>Coș mobil</span></label><label><input type="radio" name="mode" value="wind"><span>Vânt haotic</span></label><label><input type="radio" name="mode" value="bank"><span>Bank lab</span></label></fieldset>
+    <fieldset class="chipset"><legend>Dificultate</legend><label><input type="radio" name="diff" value="easy"><span>Ușor</span></label><label><input type="radio" name="diff" value="normal" checked><span>Normal</span></label><label><input type="radio" name="diff" value="hard"><span>Greu</span></label><label><input type="radio" name="diff" value="pro"><span>Pro</span></label></fieldset>
+    <fieldset class="chipset"><legend>Timp</legend><label><input type="radio" name="time" value="30"><span>30s</span></label><label><input type="radio" name="time" value="60" checked><span>60s</span></label><label><input type="radio" name="time" value="90"><span>90s</span></label></fieldset>
+  </div>
+</section>
+<main class="arena" id="arena">
+  <div class="scoreboard"><div class="sb-side me"><span class="sb-label">Tu</span><strong id="sb-you">0</strong></div><div class="sb-center"><div class="sb-meta"><span id="sb-mode">Clasic</span><span class="dot-sep">·</span><span id="sb-diff">Normal</span></div><div class="sb-clock"><span id="sb-time">60</span><em>s</em></div><div class="sb-streak" id="sb-streak" hidden>🔥 <span id="sb-streak-n">0</span></div></div><div class="sb-side ai"><span class="sb-label">AI</span><strong id="sb-ai">0</strong></div></div>
+  <div class="ribbon"><div class="rb"><b id="rb-perfect">0</b><i>Perfecte</i></div><div class="rb"><b id="rb-rim">0</b><i>Inel</i></div><div class="rb"><b id="rb-bank">0</b><i>Bank</i></div><div class="rb"><b id="rb-combo">0</b><i>Combo</i></div><div class="rb wind" id="rb-wind" hidden><b><span id="rb-wind-arrow">→</span> <span id="rb-wind-n">0</span></b><i>Vânt</i></div><div class="rb assist"><b id="rb-speed">0</b><i>Viteză</i></div></div>
+  <div class="court-wrap"><canvas id="court" width="900" height="540" aria-label="Teren de joc"></canvas><div class="overlay" id="overlay"><div class="overlay-card"><h2 id="ov-title">Gata?</h2><p id="ov-msg" class="muted"></p><div class="ov-cta"><button class="btn primary" id="ov-go">Start</button><button class="btn ghost" id="ov-back">Ieși din meci</button></div></div></div><div class="toast" id="toast" hidden></div></div>
+  <div class="controls"><div class="ctrl-row aim"><span class="ctrl-label">Țintă</span><button class="aim-btn" id="aim-l">◀</button><input type="range" id="aim" min="-45" max="45" step="1" value="0"><button class="aim-btn" id="aim-r">▶</button></div><div class="ctrl-row power"><span class="ctrl-label">Putere</span><div class="power-track"><div class="power-fill" id="power-fill"></div><div class="power-perfect" id="power-perfect"></div></div></div><div class="ctrl-row shoot"><button class="btn primary big" id="btn-shoot">ARUNCĂ</button><button class="btn ghost" id="btn-end">Ieși din meci</button></div><p class="hint">Țintește, ține apăsat pentru putere, eliberează lângă zona aurie.</p></div>
+</main>
+<aside class="hub" id="hub" hidden><div class="hub-head"><h2>Hub jucător</h2><button class="iconbtn" id="hub-close">✕</button></div><nav class="tabs"><button class="tab active" data-tab="career">Carieră</button><button class="tab" data-tab="shop">Shop</button><button class="tab" data-tab="leader">Clasament</button><button class="tab" data-tab="comp">Competiții</button></nav><section class="tab-panel active" data-panel="career"><div class="kpi-grid"><div class="kpi"><span>Nivel</span><strong id="kpi-level">1</strong></div><div class="kpi"><span>Bani</span><strong id="kpi-money">0</strong></div><div class="kpi"><span>Fani</span><strong id="kpi-fans">0</strong></div><div class="kpi"><span>Best</span><strong id="kpi-best">0</strong></div><div class="kpi"><span>Perfecte</span><strong id="kpi-perfect">0</strong></div><div class="kpi"><span>Inel</span><strong id="kpi-rim">0</strong></div><div class="kpi"><span>Bank</span><strong id="kpi-bank">0</strong></div><div class="kpi"><span>Combo max</span><strong id="kpi-combo">0</strong></div></div><div class="xp-card"><div class="xp-head"><span>Următorul nivel</span><em><span id="xp-now">0</span> / <span id="xp-need">100</span> XP</em></div><div class="xp-bar"><div class="xp-fill" id="xp-fill"></div></div></div><h3>Realizări</h3><ul class="achv" id="achv-list"></ul></section><section class="tab-panel" data-panel="shop"><h3>Îmbunătățiri</h3><ul class="shop" id="shop-list"></ul></section><section class="tab-panel" data-panel="leader"><h3>Clasament</h3><ol class="leader" id="leader-list"></ol></section><section class="tab-panel" data-panel="comp"><h3>Provocări zilnice</h3><ul class="daily" id="daily-list"></ul><h3>Turneu</h3><div class="tour" id="tour-bracket"></div><button class="btn primary" id="btn-tour">Joacă următorul meci</button><h3>Ligă</h3><ol class="league" id="league-list"></ol></section></aside>
+<dialog class="modal" id="help"><article><header><h2>Cum se joacă</h2><button class="iconbtn" id="help-close">✕</button></header><ul class="help-list"><li><b>Desktop:</b> A/D sau săgeți pentru țintire, Space pentru putere.</li><li><b>Mobil:</b> slider pentru țintă, ține apăsat ARUNCĂ pentru putere.</li><li><b>Bank:</b> unghi mai larg = bonus bank shot.</li></ul></article></dialog>
+<footer class="footer"><span>© <span id="year"></span> Laura Andreea</span><span class="muted">v2.0 · Enhanced Pro</span></footer>
+<script src="enhanced-pro.js?v=pro-1" defer></script>
 </body>
 </html>
