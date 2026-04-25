@@ -22,16 +22,17 @@
   <header class="topbar">
     <a class="brand" href="./enhanced.html" aria-label="Basket vs AI home">🏀 <span>Basket vs AI</span></a>
     <nav class="top-actions" aria-label="Quick actions">
-      <button class="ghost-btn" id="openHelpBtn" type="button">How to play</button>
-      <button class="ghost-btn" id="resetBtn" type="button">Reset</button>
+      <button class="ghost-btn" id="langToggle" type="button" aria-label="Change language">RO</button>
+      <button class="ghost-btn" id="openHelpBtn" type="button" data-i18n="howToPlay">How to play</button>
+      <button class="ghost-btn" id="resetBtn" type="button" data-i18n="reset">Reset</button>
     </nav>
   </header>
 
   <main class="app-shell">
     <section class="hero-panel" id="homeScreen">
-      <p class="eyebrow">Career arcade basketball</p>
-      <h1>Beat the AI. Build your legend.</h1>
-      <p class="hero-copy">A faster, cleaner version of Basket vs AI with polished visuals, responsive controls, career rewards, and a clearer portfolio-ready structure.</p>
+      <p class="eyebrow" data-i18n="eyebrow">Career arcade basketball</p>
+      <h1 data-i18n="heroTitle">Beat the AI. Build your legend.</h1>
+      <p class="hero-copy" data-i18n="heroCopy">A faster, cleaner version of Basket vs AI with polished visuals, responsive controls, career rewards, and a clearer portfolio-ready structure.</p>
 
       <div class="player-card">
         <div class="avatar" aria-hidden="true">🔥</div>
@@ -43,31 +44,31 @@
       </div>
 
       <div class="hero-actions">
-        <button class="primary-btn" id="playBtn" type="button">▶ Play match</button>
-        <button class="secondary-btn" id="careerBtn" type="button">📊 Career</button>
+        <button class="primary-btn" id="playBtn" type="button" data-i18n="playMatch">▶ Play match</button>
+        <button class="secondary-btn" id="careerBtn" type="button" data-i18n="career">📊 Career</button>
       </div>
 
       <div class="mode-grid" aria-label="Match settings">
         <label>
-          Mode
+          <span data-i18n="mode">Mode</span>
           <select id="modeSelect">
-            <option value="classic">Classic</option>
-            <option value="blitz">Blitz</option>
-            <option value="moving">Moving hoop</option>
-            <option value="chaos">Chaos wind</option>
+            <option value="classic" data-i18n="classic">Classic</option>
+            <option value="blitz" data-i18n="blitz">Blitz</option>
+            <option value="moving" data-i18n="moving">Moving hoop</option>
+            <option value="chaos" data-i18n="chaos">Chaos wind</option>
           </select>
         </label>
         <label>
-          Difficulty
+          <span data-i18n="difficulty">Difficulty</span>
           <select id="difficultySelect">
-            <option value="easy">Easy</option>
-            <option value="normal" selected>Normal</option>
-            <option value="hard">Hard</option>
-            <option value="pro">Pro</option>
+            <option value="easy" data-i18n="easy">Easy</option>
+            <option value="normal" selected data-i18n="normal">Normal</option>
+            <option value="hard" data-i18n="hard">Hard</option>
+            <option value="pro" data-i18n="pro">Pro</option>
           </select>
         </label>
         <label>
-          Time
+          <span data-i18n="time">Time</span>
           <select id="timeSelect">
             <option value="30">30s</option>
             <option value="60" selected>60s</option>
@@ -79,40 +80,40 @@
 
     <section class="game-panel hidden" id="gameScreen" aria-label="Basketball match">
       <div class="scoreboard">
-        <div><span>You</span><strong id="youScore">0</strong></div>
+        <div><span data-i18n="you">You</span><strong id="youScore">0</strong></div>
         <div class="timer"><span id="modeLabel">Classic · Normal</span><strong id="timer">60</strong></div>
         <div><span>AI</span><strong id="aiScore">0</strong></div>
       </div>
 
       <canvas id="gameCanvas" width="900" height="620" aria-label="Basketball court canvas"></canvas>
 
-      <div class="mobile-hint" id="shotHint">Hold shoot, aim, then release.</div>
+      <div class="mobile-hint" id="shotHint" data-i18n="shotHint">Hold shoot, aim, then release.</div>
       <div class="controls">
         <button class="aim-btn" id="leftBtn" type="button" aria-label="Aim left">◀</button>
         <div class="power-wrap" aria-label="Shot power">
-          <span>Power</span>
+          <span data-i18n="power">Power</span>
           <div class="power-track"><div id="powerFill" class="power-fill"></div></div>
         </div>
-        <button class="shoot-btn" id="shootBtn" type="button">SHOOT</button>
+        <button class="shoot-btn" id="shootBtn" type="button" data-i18n="shoot">SHOOT</button>
         <button class="aim-btn" id="rightBtn" type="button" aria-label="Aim right">▶</button>
       </div>
-      <button class="secondary-btn small" id="quitBtn" type="button">Exit match</button>
+      <button class="secondary-btn small" id="quitBtn" type="button" data-i18n="exitMatch">Exit match</button>
     </section>
 
     <aside class="career-panel hidden" id="careerScreen">
       <div class="panel-head">
-        <h2>Career dashboard</h2>
-        <button class="ghost-btn" id="closeCareerBtn" type="button">Close</button>
+        <h2 data-i18n="careerDashboard">Career dashboard</h2>
+        <button class="ghost-btn" id="closeCareerBtn" type="button" data-i18n="close">Close</button>
       </div>
       <div class="stats-grid">
-        <article><span>Level</span><strong id="statLevel">1</strong></article>
-        <article><span>Cash</span><strong id="statCash">0</strong></article>
-        <article><span>Fans</span><strong id="statFans">0</strong></article>
-        <article><span>Best score</span><strong id="statBest">0</strong></article>
+        <article><span data-i18n="level">Level</span><strong id="statLevel">1</strong></article>
+        <article><span data-i18n="cash">Cash</span><strong id="statCash">0</strong></article>
+        <article><span data-i18n="fans">Fans</span><strong id="statFans">0</strong></article>
+        <article><span data-i18n="bestScore">Best score</span><strong id="statBest">0</strong></article>
       </div>
-      <h3>Upgrades</h3>
+      <h3 data-i18n="upgrades">Upgrades</h3>
       <div class="upgrade-list" id="upgradeList"></div>
-      <h3>Achievements</h3>
+      <h3 data-i18n="achievements">Achievements</h3>
       <div class="achievement-list" id="achievementList"></div>
     </aside>
   </main>
@@ -120,12 +121,12 @@
   <dialog class="help-dialog" id="helpDialog">
     <form method="dialog">
       <button class="dialog-close" aria-label="Close help">×</button>
-      <h2>How to play</h2>
+      <h2 data-i18n="howToPlay">How to play</h2>
       <ul>
-        <li><strong>Desktop:</strong> hold Space or the SHOOT button to charge power.</li>
-        <li>Use A/D or arrow keys to aim before releasing.</li>
-        <li><strong>Mobile:</strong> hold SHOOT and use the left/right buttons.</li>
-        <li>Wins give XP, cash, and fans. Spend cash on upgrades.</li>
+        <li data-i18n="helpDesktop"><strong>Desktop:</strong> hold Space or the SHOOT button to charge power.</li>
+        <li data-i18n="helpAim">Use A/D or arrow keys to aim before releasing.</li>
+        <li data-i18n="helpMobile"><strong>Mobile:</strong> hold SHOOT and use the left/right buttons.</li>
+        <li data-i18n="helpRewards">Wins give XP, cash, and fans. Spend cash on upgrades.</li>
       </ul>
     </form>
   </dialog>
