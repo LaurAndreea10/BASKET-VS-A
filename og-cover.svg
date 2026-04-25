@@ -1,0 +1,54 @@
+<svg viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="floor" cx="50%" cy="100%" r="80%">
+      <stop offset="0%" stop-color="#ff8c3a"/>
+      <stop offset="40%" stop-color="#b54a18"/>
+      <stop offset="100%" stop-color="#0a0a14"/>
+    </radialGradient>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a0a14"/>
+      <stop offset="100%" stop-color="#3a1060"/>
+    </linearGradient>
+    <linearGradient id="ballGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffae00"/>
+      <stop offset="60%" stop-color="#ff6a1f"/>
+      <stop offset="100%" stop-color="#8a2200"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="4"/></filter>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#1f1f3d" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#sky)"/>
+  <rect width="1200" height="350" fill="url(#grid)" opacity=".4"/>
+  <rect y="350" width="1200" height="280" fill="url(#floor)"/>
+
+  <g stroke="#fff8e0" stroke-width="2" fill="none" opacity=".7">
+    <line x1="0" y1="350" x2="1200" y2="350"/>
+    <path d="M 350 350 Q 600 180 850 350"/>
+    <path d="M 50 620 L 600 400 L 1150 620" stroke-dasharray="10 10"/>
+  </g>
+
+  <g transform="translate(950 360)">
+    <ellipse cx="0" cy="180" rx="140" ry="14" fill="#000" opacity=".5"/>
+    <circle r="160" fill="url(#ballGrad)"/>
+    <g stroke="#3a0e00" stroke-width="4" fill="none" opacity=".85">
+      <circle r="160"/>
+      <line x1="-160" y1="0" x2="160" y2="0"/>
+      <path d="M0 -160 Q 40 0 0 160"/>
+      <path d="M0 -160 Q -40 0 0 160"/>
+    </g>
+    <circle r="170" fill="none" stroke="#ffae00" stroke-width="2" opacity=".4" filter="url(#glow)"/>
+  </g>
+
+  <g transform="translate(80 360)">
+    <text font-family="'Bungee',sans-serif" font-size="120" fill="#fff" letter-spacing="-3">BASKET</text>
+    <text font-family="'Bungee',sans-serif" font-size="46" fill="#00f0ff"
+          transform="translate(15 -90) rotate(-8)" filter="url(#glow)">VS</text>
+    <text font-family="'Bungee',sans-serif" font-size="120" fill="#ff6a1f"
+          y="115" letter-spacing="-3">A.I.</text>
+    <text font-family="'Space Mono',monospace" font-size="18" fill="#c4ff3d"
+          y="165" letter-spacing="6">CAREER MODE · 3.0</text>
+  </g>
+</svg>
