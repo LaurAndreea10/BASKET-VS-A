@@ -1,4 +1,4 @@
-# BASKET VS A
+# BASKET VS AI
 
 A browser-based basketball game built as part of a personal front-end portfolio, focused on arcade gameplay, dynamic interaction, and a modern visual style.
 
