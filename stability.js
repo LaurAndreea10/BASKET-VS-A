@@ -1,31 +1,23 @@
 (() => {
   const ready = (fn) => document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', fn) : fn();
 
+  function loadAssetOnce(tag, id, attrs) {
+    if (document.getElementById(id)) return;
+    const node = document.createElement(tag);
+    node.id = id;
+    Object.entries(attrs).forEach(([key, value]) => node[key] = value);
+    (tag === 'link' ? document.head : document.body).appendChild(node);
+  }
+
   function loadPolishLayer() {
-    const cssId = 'gameplay-polish-css';
-    const jsId = 'gameplay-polish-js';
-    const rendererId = 'canvas-render-v2-js';
-    if (!document.getElementById(cssId)) {
-      const link = document.createElement('link');
-      link.id = cssId;
-      link.rel = 'stylesheet';
-      link.href = 'gameplay-polish.css?v=assets-5';
-      document.head.appendChild(link);
-    }
-    if (!document.getElementById(jsId)) {
-      const script = document.createElement('script');
-      script.id = jsId;
-      script.src = 'gameplay-polish.js?v=assets-5';
-      script.defer = true;
-      document.body.appendChild(script);
-    }
-    if (!document.getElementById(rendererId)) {
-      const renderer = document.createElement('script');
-      renderer.id = rendererId;
-      renderer.src = 'canvas-render-v2.js?v=assets-5';
-      renderer.defer = true;
-      document.body.appendChild(renderer);
-    }
+    loadAssetOnce('link', 'gameplay-polish-css', { rel: 'stylesheet', href: 'gameplay-polish.css?v=assets-7' });
+    loadAssetOnce('link', 'player-customizer-css', { rel: 'stylesheet', href: 'player-customizer.css?v=assets-7' });
+    loadAssetOnce('link', 'player-court-sprite-css', { rel: 'stylesheet', href: 'player-court-sprite.css?v=assets-7' });
+    loadAssetOnce('script', 'gameplay-polish-js', { src: 'gameplay-polish.js?v=assets-7', defer: true });
+    loadAssetOnce('script', 'ball-physics-fix-js', { src: 'ball-physics-fix.js?v=assets-7', defer: true });
+    loadAssetOnce('script', 'canvas-render-v2-js', { src: 'canvas-render-v2.js?v=assets-7', defer: true });
+    loadAssetOnce('script', 'player-customizer-js', { src: 'player-customizer.js?v=assets-7', defer: true });
+    loadAssetOnce('script', 'player-court-sprite-js', { src: 'player-court-sprite.js?v=assets-7', defer: true });
   }
 
   ready(() => {
