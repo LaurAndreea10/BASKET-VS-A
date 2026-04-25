@@ -1,7 +1,28 @@
 (() => {
   const ready = (fn) => document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', fn) : fn();
 
+  function loadPolishLayer() {
+    const cssId = 'gameplay-polish-css';
+    const jsId = 'gameplay-polish-js';
+    if (!document.getElementById(cssId)) {
+      const link = document.createElement('link');
+      link.id = cssId;
+      link.rel = 'stylesheet';
+      link.href = 'gameplay-polish.css?v=assets-4';
+      document.head.appendChild(link);
+    }
+    if (!document.getElementById(jsId)) {
+      const script = document.createElement('script');
+      script.id = jsId;
+      script.src = 'gameplay-polish.js?v=assets-4';
+      script.defer = true;
+      document.body.appendChild(script);
+    }
+  }
+
   ready(() => {
+    loadPolishLayer();
+
     const body = document.body;
     const gameScreen = document.getElementById('gameScreen');
     const shootBtn = document.getElementById('shootBtn');
