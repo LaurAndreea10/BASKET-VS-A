@@ -1,10 +1,16 @@
 # 🏀 Basket vs AI
 
-A browser-based basketball arcade game with a full career mode, AI opponent, match settings, upgrades, achievements, and responsive controls for desktop and mobile.
+A browser-based basketball arcade game with career progression, AI opponent, match settings, upgrades, achievements, and responsive controls for desktop and mobile.
 
 ## 🔗 Live Demo
 
+Main version:
+
 https://laurandreea10.github.io/BASKET-VS-AI/
+
+Enhanced refactored version:
+
+https://laurandreea10.github.io/BASKET-VS-AI/enhanced.html
 
 ## ✨ Highlights
 
@@ -15,6 +21,14 @@ https://laurandreea10.github.io/BASKET-VS-AI/
 - Touch-friendly mobile controls and keyboard controls for desktop
 - Achievements, leaderboard-style stats, league progress, and challenges
 - Responsive single-page experience hosted on GitHub Pages
+
+## ✅ Latest Improvements
+
+- Added a polished enhanced page with a stronger hero section, glow effects, animated-feeling UI, and cleaner visual hierarchy
+- Improved mobile UX with larger touch buttons, clearer controls, and responsive layouts
+- Added an in-game **How to play** dialog for desktop and mobile controls
+- Refactored the enhanced version into separate files: `enhanced.html`, `styles.css`, and `script.js`
+- Added SEO and portfolio polish with meta description, Open Graph tags, Twitter card metadata, and a better page title
 
 ## 🎮 Controls
 
@@ -43,8 +57,11 @@ https://laurandreea10.github.io/BASKET-VS-AI/
 
 ```text
 BASKET-VS-AI/
-├── index.html   # Game UI, styles, and logic
-└── README.md    # Project documentation
+├── index.html      # Original full game page
+├── enhanced.html   # Refactored enhanced game page
+├── styles.css      # Enhanced responsive styling
+├── script.js       # Enhanced game logic and career state
+└── README.md       # Project documentation
 ```
 
 ## 🚀 Deployment
