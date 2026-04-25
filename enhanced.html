@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Basket vs AI is a responsive browser basketball arcade game with AI matches, career progression, upgrades, achievements, and mobile-friendly controls." />
+  <meta name="theme-color" content="#0a0a0f" />
+  <meta property="og:title" content="Basket vs AI — Arcade Basketball Career Game" />
+  <meta property="og:description" content="Play quick basketball matches, beat the AI, upgrade your player, and build your career in a responsive HTML5 canvas game." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://laurandreea10.github.io/BASKET-VS-AI/enhanced.html" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <title>🏀 Basket vs AI — Enhanced Career</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="court-glow" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="./enhanced.html" aria-label="Basket vs AI home">🏀 <span>Basket vs AI</span></a>
+    <nav class="top-actions" aria-label="Quick actions">
+      <button class="ghost-btn" id="openHelpBtn" type="button">How to play</button>
+      <button class="ghost-btn" id="resetBtn" type="button">Reset</button>
+    </nav>
+  </header>
+
+  <main class="app-shell">
+    <section class="hero-panel" id="homeScreen">
+      <p class="eyebrow">Career arcade basketball</p>
+      <h1>Beat the AI. Build your legend.</h1>
+      <p class="hero-copy">A faster, cleaner version of Basket vs AI with polished visuals, responsive controls, career rewards, and a clearer portfolio-ready structure.</p>
+
+      <div class="player-card">
+        <div class="avatar" aria-hidden="true">🔥</div>
+        <div>
+          <strong id="playerRank">Rookie</strong>
+          <span id="careerMeta">Level 1 · 0 XP · 0 fans</span>
+          <div class="xp-track"><div id="xpFill" class="xp-fill"></div></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <button class="primary-btn" id="playBtn" type="button">▶ Play match</button>
+        <button class="secondary-btn" id="careerBtn" type="button">📊 Career</button>
+      </div>
+
+      <div class="mode-grid" aria-label="Match settings">
+        <label>
+          Mode
+          <select id="modeSelect">
+            <option value="classic">Classic</option>
+            <option value="blitz">Blitz</option>
+            <option value="moving">Moving hoop</option>
+            <option value="chaos">Chaos wind</option>
+          </select>
+        </label>
+        <label>
+          Difficulty
+          <select id="difficultySelect">
+            <option value="easy">Easy</option>
+            <option value="normal" selected>Normal</option>
+            <option value="hard">Hard</option>
+            <option value="pro">Pro</option>
+          </select>
+        </label>
+        <label>
+          Time
+          <select id="timeSelect">
+            <option value="30">30s</option>
+            <option value="60" selected>60s</option>
+            <option value="90">90s</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <section class="game-panel hidden" id="gameScreen" aria-label="Basketball match">
+      <div class="scoreboard">
+        <div><span>You</span><strong id="youScore">0</strong></div>
+        <div class="timer"><span id="modeLabel">Classic · Normal</span><strong id="timer">60</strong></div>
+        <div><span>AI</span><strong id="aiScore">0</strong></div>
+      </div>
+
+      <canvas id="gameCanvas" width="900" height="620" aria-label="Basketball court canvas"></canvas>
+
+      <div class="mobile-hint" id="shotHint">Hold shoot, aim, then release.</div>
+      <div class="controls">
+        <button class="aim-btn" id="leftBtn" type="button" aria-label="Aim left">◀</button>
+        <div class="power-wrap" aria-label="Shot power">
+          <span>Power</span>
+          <div class="power-track"><div id="powerFill" class="power-fill"></div></div>
+        </div>
+        <button class="shoot-btn" id="shootBtn" type="button">SHOOT</button>
+        <button class="aim-btn" id="rightBtn" type="button" aria-label="Aim right">▶</button>
+      </div>
+      <button class="secondary-btn small" id="quitBtn" type="button">Exit match</button>
+    </section>
+
+    <aside class="career-panel hidden" id="careerScreen">
+      <div class="panel-head">
+        <h2>Career dashboard</h2>
+        <button class="ghost-btn" id="closeCareerBtn" type="button">Close</button>
+      </div>
+      <div class="stats-grid">
+        <article><span>Level</span><strong id="statLevel">1</strong></article>
+        <article><span>Cash</span><strong id="statCash">0</strong></article>
+        <article><span>Fans</span><strong id="statFans">0</strong></article>
+        <article><span>Best score</span><strong id="statBest">0</strong></article>
+      </div>
+      <h3>Upgrades</h3>
+      <div class="upgrade-list" id="upgradeList"></div>
+      <h3>Achievements</h3>
+      <div class="achievement-list" id="achievementList"></div>
+    </aside>
+  </main>
+
+  <dialog class="help-dialog" id="helpDialog">
+    <form method="dialog">
+      <button class="dialog-close" aria-label="Close help">×</button>
+      <h2>How to play</h2>
+      <ul>
+        <li><strong>Desktop:</strong> hold Space or the SHOOT button to charge power.</li>
+        <li>Use A/D or arrow keys to aim before releasing.</li>
+        <li><strong>Mobile:</strong> hold SHOOT and use the left/right buttons.</li>
+        <li>Wins give XP, cash, and fans. Spend cash on upgrades.</li>
+      </ul>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="script.js" defer></script>
+</body>
+</html>
