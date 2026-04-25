@@ -2,145 +2,70 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Basket vs AI is a responsive browser basketball arcade game with AI matches, career progression, upgrades, achievements, and mobile-friendly controls." />
-  <meta name="theme-color" content="#0a0a0f" />
-  <meta property="og:title" content="🏀 Basket vs AI — Career 3.0" />
-  <meta property="og:description" content="Beat the AI, earn XP, buy upgrades and conquer the league." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Basket vs AI Enhanced Pro is a responsive arcade basketball game with aim control, bank shots, wind, perfect shot assist, career, shop, leaderboard and competitions." />
+  <meta name="theme-color" content="#050814" />
+  <meta property="og:title" content="🏀 Basket vs AI — Enhanced Pro" />
+  <meta property="og:description" content="A bilingual RO/EN basketball arcade game with PRO gameplay, career progression and competitions." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://laurandreea10.github.io/BASKET-VS-AI/enhanced.html" />
   <meta property="og:image" content="https://laurandreea10.github.io/BASKET-VS-AI/og-cover.svg" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="https://laurandreea10.github.io/BASKET-VS-AI/og-cover.svg" />
-  <title>🏀 Basket vs AI — Career 3.0</title>
+  <title>🏀 Basket vs AI — Enhanced Pro</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Mono:wght@400;700&family=Syne:wght@600;700;800&family=Bebas+Neue&family=DM+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=assets-1" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=assets-2" />
   <link rel="stylesheet" href="cover-scene.css?v=assets-1" />
 </head>
 <body>
   <div class="court-glow" aria-hidden="true"></div>
-
   <header class="topbar">
-    <a class="brand" href="./enhanced.html" aria-label="Basket vs AI home"><img src="logo.svg" alt="Basket vs AI" class="nav-logo" /></a>
+    <a class="brand" href="./enhanced.html" aria-label="Basket vs AI home"><img src="logo.svg" alt="Basket vs AI" class="nav-logo" /><span>Enhanced Pro</span></a>
     <nav class="top-actions" aria-label="Quick actions">
+      <button class="ghost-btn" id="soundBtn" type="button" data-i18n="sound">Sound</button>
       <button class="ghost-btn" id="langToggle" type="button" aria-label="Change language">RO</button>
       <button class="ghost-btn" id="openHelpBtn" type="button" data-i18n="howToPlay">How to play</button>
-      <button class="ghost-btn" id="resetBtn" type="button" data-i18n="reset">Reset</button>
+      <button class="ghost-btn danger" id="resetBtn" type="button" data-i18n="reset">Reset</button>
     </nav>
   </header>
-
-  <main class="app-shell">
+  <main class="app-shell" id="appShell">
     <section class="hero-panel" id="homeScreen">
-      <div class="official-cover-card">
-        <img src="og-cover.svg" alt="Basket vs AI Career 3.0 cover" class="official-cover" />
-      </div>
-
-      <p class="eyebrow" data-i18n="eyebrow">Career arcade basketball</p>
+      <div class="official-cover-card"><img src="og-cover.svg" alt="Basket vs AI Enhanced Pro cover" class="official-cover" /></div>
+      <p class="eyebrow" data-i18n="eyebrow">Enhanced arcade basketball</p>
       <h1 data-i18n="heroTitle">Beat the AI. Build your legend.</h1>
-      <p class="hero-copy" data-i18n="heroCopy">A faster, cleaner version of Basket vs AI with polished visuals, responsive controls, career rewards, and a clearer portfolio-ready structure.</p>
-
-      <div class="player-card">
-        <div class="avatar" aria-hidden="true">🔥</div>
-        <div>
-          <strong id="playerRank">Rookie</strong>
-          <span id="careerMeta">Level 1 · 0 XP · 0 fans</span>
-          <div class="xp-track"><div id="xpFill" class="xp-fill"></div></div>
-        </div>
-      </div>
-
-      <div class="hero-actions">
-        <button class="primary-btn" id="playBtn" type="button" data-i18n="playMatch">▶ Play match</button>
-        <button class="secondary-btn" id="careerBtn" type="button" data-i18n="career">📊 Career</button>
-      </div>
-
+      <p class="hero-copy" data-i18n="heroCopy">PRO mechanics on top of the Enhanced career: separate aim and power, bank shots, wind, perfect assist, competitions, shop and leaderboard.</p>
+      <div class="player-card"><div class="avatar" aria-hidden="true">🔥</div><div><strong id="playerRank">Rookie</strong><span id="careerMeta">Level 1 · 0 XP · 0 fans</span><div class="xp-track" aria-label="XP progress"><div id="xpFill" class="xp-fill"></div></div></div></div>
+      <div class="hero-actions"><button class="primary-btn" id="playBtn" type="button" data-i18n="playMatch">▶ Play match</button><button class="secondary-btn" id="careerBtn" type="button" data-i18n="openHub">🏆 Open hub</button></div>
       <div class="mode-grid" aria-label="Match settings">
-        <label>
-          <span data-i18n="mode">Mode</span>
-          <select id="modeSelect">
-            <option value="classic" data-i18n="classic">Classic</option>
-            <option value="blitz" data-i18n="blitz">Blitz</option>
-            <option value="moving" data-i18n="moving">Moving hoop</option>
-            <option value="chaos" data-i18n="chaos">Chaos wind</option>
-          </select>
-        </label>
-        <label>
-          <span data-i18n="difficulty">Difficulty</span>
-          <select id="difficultySelect">
-            <option value="easy" data-i18n="easy">Easy</option>
-            <option value="normal" selected data-i18n="normal">Normal</option>
-            <option value="hard" data-i18n="hard">Hard</option>
-            <option value="pro" data-i18n="pro">Pro</option>
-          </select>
-        </label>
-        <label>
-          <span data-i18n="time">Time</span>
-          <select id="timeSelect">
-            <option value="30">30s</option>
-            <option value="60" selected>60s</option>
-            <option value="90">90s</option>
-          </select>
-        </label>
+        <label><span data-i18n="mode">Mode</span><select id="modeSelect"><option value="classic" data-i18n="classic">Classic</option><option value="blitz" data-i18n="blitz">Blitz</option><option value="moving" data-i18n="moving">Moving hoop</option><option value="chaos" data-i18n="chaos">Chaos wind</option><option value="bank" data-i18n="bankMode">Bank lab</option></select></label>
+        <label><span data-i18n="difficulty">Difficulty</span><select id="difficultySelect"><option value="easy" data-i18n="easy">Easy</option><option value="normal" selected data-i18n="normal">Normal</option><option value="hard" data-i18n="hard">Hard</option><option value="pro" data-i18n="pro">Pro</option></select></label>
+        <label><span data-i18n="time">Time</span><select id="timeSelect"><option value="30">30s</option><option value="60" selected>60s</option><option value="90">90s</option></select></label>
       </div>
     </section>
-
     <section class="game-panel hidden" id="gameScreen" aria-label="Basketball match">
-      <div class="scoreboard">
-        <div><span data-i18n="you">You</span><strong id="youScore">0</strong></div>
-        <div class="timer"><span id="modeLabel">Classic · Normal</span><strong id="timer">60</strong></div>
-        <div><span>AI</span><strong id="aiScore">0</strong></div>
-      </div>
-
+      <div class="scoreboard advanced-scoreboard"><div class="score-card"><span data-i18n="you">You</span><strong id="youScore">0</strong></div><div class="timer score-card"><span id="modeLabel">Classic · Normal</span><strong id="timer">60</strong></div><div class="score-card"><span>AI</span><strong id="aiScore">0</strong></div></div>
+      <div class="match-stats" aria-label="Match stats"><span><b id="perfectShotsStat">0</b> <em data-i18n="perfectShots">Perfect</em></span><span><b id="rimHitsStat">0</b> <em data-i18n="rimHits">Rim hits</em></span><span><b id="bankShotsStat">0</b> <em data-i18n="bankShots">Bank shots</em></span><span><b id="comboStat">0</b> <em data-i18n="combo">Combo</em></span></div>
+      <div class="assist-panel"><div class="wind-chip" id="windChip">💨 0</div><div class="assist-track" aria-label="Perfect shot assist"><span data-i18n="perfectAssist">Perfect assist</span><div class="assist-bar"><i class="assist-zone weak"></i><i class="assist-zone good"></i><i class="assist-zone perfect"></i><i class="assist-zone strong"></i><b id="assistNeedle"></b></div><small id="assistLabel">Good arc</small></div><div class="speed-chip"><span data-i18n="ballSpeed">Ball speed</span> <b id="speedStat">0</b></div></div>
       <canvas id="gameCanvas" width="900" height="620" aria-label="Basketball court canvas"></canvas>
-
-      <div class="mobile-hint" id="shotHint" data-i18n="shotHint">Hold shoot, aim, then release.</div>
-      <div class="controls">
-        <button class="aim-btn" id="leftBtn" type="button" aria-label="Aim left">◀</button>
-        <div class="power-wrap" aria-label="Shot power">
-          <span data-i18n="power">Power</span>
-          <div class="power-track"><div id="powerFill" class="power-fill"></div></div>
-        </div>
-        <button class="shoot-btn" id="shootBtn" type="button" data-i18n="shoot">SHOOT</button>
-        <button class="aim-btn" id="rightBtn" type="button" aria-label="Aim right">▶</button>
-      </div>
+      <div class="mobile-hint" id="shotHint" data-i18n="shotHint">Aim separately, hold shoot for power, release near the gold zone.</div>
+      <div class="controls"><button class="aim-btn" id="leftBtn" type="button" aria-label="Aim left">◀</button><label class="aim-slider-wrap"><span data-i18n="aimControl">Aim control</span><input id="aimSlider" type="range" min="-100" max="100" value="0" /></label><div class="power-wrap" aria-label="Shot power"><span data-i18n="power">Power</span><div class="power-track"><div id="powerFill" class="power-fill"></div></div></div><button class="shoot-btn" id="shootBtn" type="button" data-i18n="shoot">SHOOT</button><button class="aim-btn" id="rightBtn" type="button" aria-label="Aim right">▶</button></div>
       <button class="secondary-btn small" id="quitBtn" type="button" data-i18n="exitMatch">Exit match</button>
     </section>
-
     <aside class="career-panel hidden" id="careerScreen">
-      <div class="panel-head">
-        <h2 data-i18n="careerDashboard">Career dashboard</h2>
-        <button class="ghost-btn" id="closeCareerBtn" type="button" data-i18n="close">Close</button>
-      </div>
-      <div class="stats-grid">
-        <article><span data-i18n="level">Level</span><strong id="statLevel">1</strong></article>
-        <article><span data-i18n="cash">Cash</span><strong id="statCash">0</strong></article>
-        <article><span data-i18n="fans">Fans</span><strong id="statFans">0</strong></article>
-        <article><span data-i18n="bestScore">Best score</span><strong id="statBest">0</strong></article>
-      </div>
-      <h3 data-i18n="upgrades">Upgrades</h3>
-      <div class="upgrade-list" id="upgradeList"></div>
-      <h3 data-i18n="achievements">Achievements</h3>
-      <div class="achievement-list" id="achievementList"></div>
+      <div class="panel-head"><h2 data-i18n="hubTitle">Player hub</h2><button class="ghost-btn" id="closeCareerBtn" type="button" data-i18n="close">Close</button></div>
+      <div class="tabs" role="tablist" aria-label="Player hub tabs"><button class="tab active" type="button" data-tab="career" data-i18n="career">Career</button><button class="tab" type="button" data-tab="shop" data-i18n="shop">Shop</button><button class="tab" type="button" data-tab="leaderboard" data-i18n="leaderboard">Leaderboard</button><button class="tab" type="button" data-tab="competitions" data-i18n="competitions">Competitions</button></div>
+      <section class="tab-section active" id="tab-career"><div class="stats-grid"><article><span data-i18n="level">Level</span><strong id="statLevel">1</strong></article><article><span data-i18n="cash">Cash</span><strong id="statCash">0</strong></article><article><span data-i18n="fans">Fans</span><strong id="statFans">0</strong></article><article><span data-i18n="bestScore">Best score</span><strong id="statBest">0</strong></article><article><span data-i18n="perfectShots">Perfect</span><strong id="careerPerfectShots">0</strong></article><article><span data-i18n="rimHits">Rim hits</span><strong id="careerRimHits">0</strong></article><article><span data-i18n="bankShots">Bank shots</span><strong id="careerBankShots">0</strong></article><article><span data-i18n="bestCombo">Best combo</span><strong id="careerBestCombo">0</strong></article></div><h3 data-i18n="achievements">Achievements</h3><div class="achievement-list" id="achievementList"></div></section>
+      <section class="tab-section" id="tab-shop"><h3 data-i18n="upgrades">Upgrades</h3><div class="upgrade-list" id="upgradeList"></div></section>
+      <section class="tab-section" id="tab-leaderboard"><h3 data-i18n="leaderboard">Leaderboard</h3><div class="leaderboard-list" id="leaderboardList"></div></section>
+      <section class="tab-section" id="tab-competitions"><h3 data-i18n="competitions">Competitions</h3><div class="competition-list" id="competitionList"></div></section>
     </aside>
   </main>
-
-  <dialog class="help-dialog" id="helpDialog">
-    <form method="dialog">
-      <button class="dialog-close" aria-label="Close help">×</button>
-      <h2 data-i18n="howToPlay">How to play</h2>
-      <ul>
-        <li data-i18n="helpDesktop"><strong>Desktop:</strong> hold Space or the SHOOT button to charge power.</li>
-        <li data-i18n="helpAim">Use A/D or arrow keys to aim before releasing.</li>
-        <li data-i18n="helpMobile"><strong>Mobile:</strong> hold SHOOT and use the left/right buttons.</li>
-        <li data-i18n="helpRewards">Wins give XP, cash, and fans. Spend cash on upgrades.</li>
-      </ul>
-    </form>
-  </dialog>
-
+  <dialog class="help-dialog" id="helpDialog"><form method="dialog"><button class="dialog-close" aria-label="Close help">×</button><h2 data-i18n="howToPlay">How to play</h2><ul><li data-i18n="helpDesktop"><strong>Desktop:</strong> use A/D or arrows for aim, hold Space for power.</li><li data-i18n="helpAim">The aim slider and aim buttons are independent from power.</li><li data-i18n="helpBank">Bank shots can bounce off the backboard for bonus points.</li><li data-i18n="helpMobile"><strong>Mobile:</strong> drag the aim slider, hold SHOOT, release near the gold zone.</li><li data-i18n="helpRewards">Wins give XP, cash and fans. Shop upgrades improve assist, wind control and clutch shots.</li></ul></form></dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="script.js?v=assets-1" defer></script>
+  <script src="script.js?v=assets-2" defer></script>
   <script src="realistic-graphics.js?v=assets-1" defer></script>
   <script src="i18n-fix.js?v=assets-1" defer></script>
 </body>
