@@ -10,14 +10,14 @@
   }
 
   function loadPolishLayer() {
-    loadAssetOnce('link', 'gameplay-polish-css', { rel: 'stylesheet', href: 'gameplay-polish.css?v=assets-8' });
-    loadAssetOnce('link', 'player-customizer-css', { rel: 'stylesheet', href: 'player-customizer.css?v=assets-8' });
-    loadAssetOnce('link', 'player-court-sprite-css', { rel: 'stylesheet', href: 'player-court-sprite.css?v=assets-8' });
-    loadAssetOnce('script', 'gameplay-polish-js', { src: 'gameplay-polish.js?v=assets-8', defer: true });
-    loadAssetOnce('script', 'ball-physics-fix-js', { src: 'ball-physics-fix.js?v=assets-8', defer: true });
-    loadAssetOnce('script', 'canvas-render-v2-js', { src: 'canvas-render-v2.js?v=assets-8', defer: true });
-    loadAssetOnce('script', 'player-customizer-js', { src: 'player-customizer.js?v=assets-8', defer: true });
-    loadAssetOnce('script', 'canvas-player-v3-js', { src: 'canvas-player-v3.js?v=assets-8', defer: true });
+    loadAssetOnce('link', 'gameplay-polish-css', { rel: 'stylesheet', href: 'gameplay-polish.css?v=assets-9' });
+    loadAssetOnce('link', 'player-customizer-css', { rel: 'stylesheet', href: 'player-customizer.css?v=assets-9' });
+    loadAssetOnce('link', 'player-court-sprite-css', { rel: 'stylesheet', href: 'player-court-sprite.css?v=assets-9' });
+    loadAssetOnce('script', 'gameplay-polish-js', { src: 'gameplay-polish.js?v=assets-9', defer: true });
+    loadAssetOnce('script', 'canvas-render-v2-js', { src: 'canvas-render-v2.js?v=assets-9', defer: true });
+    loadAssetOnce('script', 'player-customizer-js', { src: 'player-customizer.js?v=assets-9', defer: true });
+    loadAssetOnce('script', 'canvas-player-v3-js', { src: 'canvas-player-v3.js?v=assets-9', defer: true });
+    loadAssetOnce('script', 'ball-physics-fix-v2-js', { src: 'ball-physics-fix-v2.js?v=assets-9', defer: true });
   }
 
   ready(() => {
