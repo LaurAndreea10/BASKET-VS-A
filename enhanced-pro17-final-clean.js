@@ -82,7 +82,7 @@
     if (document.getElementById('bvai-player-court-v3-loader')) return;
     const s = document.createElement('script');
     s.id = 'bvai-player-court-v3-loader';
-    s.src = 'enhanced-player-court-v3.js?v=player-court-v3-balance-2';
+    s.src = 'enhanced-player-court-v3.js?v=player-court-v3-graphics-only-1';
     s.defer = true;
     document.body.appendChild(s);
   }
