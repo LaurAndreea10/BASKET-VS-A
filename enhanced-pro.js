@@ -1,39 +1,810 @@
-(()=>{'use strict';
-const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],KEY='bvai.state.v2';
-let state=load(),lang=localStorage.getItem('bvai.lang')||'ro';
-const T={ro:{play:'▶ Joacă meci',hub:'🏆 Deschide hub',win:'Victorie!',lose:'Înfrângere',draw:'Egal',miss:'Ratat',rim:'INEL',bank:'BANK!',perfect:'PERFECT',swish:'SWISH!',reward:'+%xp XP, +%money$, +%fans fani'},en:{play:'▶ Play match',hub:'🏆 Open hub',win:'Victory!',lose:'Defeat',draw:'Draw',miss:'Miss',rim:'RIM',bank:'BANK!',perfect:'PERFECT',swish:'SWISH!',reward:'+%xp XP, +%money$, +%fans fans'}};
-function tr(k,v={}){let s=(T[lang]&&T[lang][k])||T.ro[k]||k;Object.entries(v).forEach(([a,b])=>s=s.replace('%'+a,b));return s}
-function load(){try{return{level:1,xp:0,money:0,fans:0,bestScore:0,bestCombo:0,perfectShots:0,rimHits:0,bankShots:0,wins:0,losses:0,draws:0,upgrades:{},league:{standings:[]},daily:{},...(JSON.parse(localStorage.getItem(KEY))||{})}}catch{return{level:1,xp:0,money:0,fans:0,bestScore:0,bestCombo:0,perfectShots:0,rimHits:0,bankShots:0,wins:0,losses:0,draws:0,upgrades:{},league:{standings:[]},daily:{}}}}
-function save(){localStorage.setItem(KEY,JSON.stringify(state))}function fmt(n){return Number(n||0).toLocaleString(lang==='ro'?'ro-RO':'en-US')}
-const sfx=(()=>{let c;function tone(f,d=.08,type='sine',g=.05){if($('#btn-sound')?.getAttribute('aria-pressed')==='false')return;try{c||=new(window.AudioContext||window.webkitAudioContext)();let o=c.createOscillator(),gain=c.createGain();o.type=type;o.frequency.value=f;gain.gain.value=g;gain.gain.exponentialRampToValueAtTime(.0001,c.currentTime+d);o.connect(gain).connect(c.destination);o.start();o.stop(c.currentTime+d)}catch{}}return{click:()=>tone(420,.03,'square'),swish:()=>{tone(880);setTimeout(()=>tone(1320,.1),60)},rim:()=>tone(220,.06,'square',.03),miss:()=>tone(140,.12,'sawtooth',.025),win:()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.14,'triangle'),i*100))}})();
-const GAME={cv:null,ctx:null,w:900,h:540,running:false,last:0,m:null,trails:[],particles:[],shake:0,swish:0};
-function xpNeed(){return Math.round(100*Math.pow(1.35,state.level-1))}function addXP(x){state.xp+=x;while(state.xp>=xpNeed()){state.xp-=xpNeed();state.level++;toast('Level Up!','gold')}}
-function renderHero(){['level','xp','fans'].forEach(k=>{});$('#hs-level').textContent=state.level;$('#hs-xp').textContent=fmt(state.xp);$('#hs-fans').textContent=fmt(state.fans);$('#hs-best').textContent=fmt(state.bestScore)}
-function toast(msg,kind=''){let el=$('#toast');el.textContent=msg;el.className='toast '+kind;el.hidden=false;requestAnimationFrame(()=>el.classList.add('show'));clearTimeout(toast.t);toast.t=setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.hidden=true,260)},1600)}
-function setupCanvas(cv){let ctx=cv.getContext('2d');function fit(){let d=Math.min(devicePixelRatio||1,2),r=cv.getBoundingClientRect();cv.width=r.width*d;cv.height=r.height*d;ctx.setTransform(d,0,0,d,0,0);GAME.w=r.width;GAME.h=r.height}fit();new ResizeObserver(fit).observe(cv);return ctx}
-function newMatch(){let mode=$('input[name=mode]:checked').value,diff=$('input[name=diff]:checked').value,time=+$('input[name=time]:checked').value;return{mode,diff,time,timeLeft:time,you:0,ai:0,perfect:0,rim:0,bank:0,combo:0,bestCombo:0,made:0,shots:0,power:0,charging:false,held:0,aimAngle:+$('#aim').value,ball:null,ended:false,aiNext:2+Math.random()*2,wind:0,windTarget:0,rimT:0,acc:{easy:.45,normal:.6,hard:.72,pro:.82}[diff]||.6}}
-function startMatch(){GAME.m=newMatch();GAME.running=true;GAME.trails=[];GAME.particles=[];GAME.last=performance.now();$('#overlay').hidden=true;$('#sb-mode').textContent=$('input[name=mode]:checked+span').textContent;$('#sb-diff').textContent=$('input[name=diff]:checked+span').textContent;sfx.click();requestAnimationFrame(tick)}
-function endMatch(){let m=GAME.m;if(!m||m.ended)return;m.ended=true;GAME.running=false;let won=m.you>m.ai,draw=m.you===m.ai;state.bestScore=Math.max(state.bestScore,m.you);state.bestCombo=Math.max(state.bestCombo,m.bestCombo);state.perfectShots+=m.perfect;state.rimHits+=m.rim;state.bankShots+=m.bank;let xp=30+m.you*5+(won?50:draw?20:0),money=20+m.you*4+(won?40:0),fans=5+m.you*2+(won?30:0);if(won)state.wins++;else if(draw)state.draws++;else state.losses++;state.money+=money;state.fans+=fans;addXP(xp);save();renderHero();renderHub();sfx[won?'win':'miss']();$('#ov-title').textContent=won?tr('win'):draw?tr('draw'):tr('lose');$('#ov-msg').textContent=tr('reward',{xp,money,fans});$('#overlay').hidden=false}
-function quit(){GAME.running=false;GAME.m=null;$('#overlay').hidden=false;$('#ov-title').textContent='Start';$('#ov-msg').textContent='Țintește, ține apăsat pentru putere, eliberează lângă zona aurie.'}
-function rim(){let m=GAME.m||{mode:'classic',rimT:0},x=GAME.w*.82,y=GAME.h*.42;if(m.mode==='moving')x+=Math.sin(m.rimT)*GAME.w*.07;return{x,y,r:GAME.w*.035}}
-function startShot(){let m=GAME.m;if(!m||m.ball||m.ended)return;m.charging=true;m.held=performance.now();m.power=0}
-function releaseShot(){let m=GAME.m;if(!m||!m.charging)return;m.charging=false;if(m.ball||m.power<.08){m.power=0;return}let p=m.power,ang=(-Math.PI/2.4)+(m.aimAngle*Math.PI/180),v=8+p*12,px=GAME.w*.22,py=GAME.h*.82-GAME.h*.32;m.ball={x:px,y:py,vx:Math.cos(ang)*v*60,vy:Math.sin(ang)*v*60,life:0,perfect:p>=.6&&p<=.72,bankAttempt:Math.abs(m.aimAngle)>18,state:'flight',bankHit:false,rimHit:false};m.shots++;m.power=0}
-function step(dt){let m=GAME.m;if(!m)return;if(m.charging){let p=((performance.now()-m.held)/1000)%2;if(p>1)p=2-p;m.power=p}m.timeLeft-=dt;if(m.timeLeft<=0){m.timeLeft=0;endMatch()}if(m.mode==='wind'){m.windTarget+=(Math.random()-.5)*120*dt;m.windTarget=Math.max(-90,Math.min(90,m.windTarget));m.wind+=(m.windTarget-m.wind)*Math.min(1,dt*2)}else m.wind=0;if(m.mode==='moving')m.rimT+=dt*1.2;m.aiNext-=dt;if(m.aiNext<=0){m.aiNext=2.2+Math.random()*2.3;if(Math.random()<m.acc)m.ai+=Math.random()<.15?3:2}if(m.ball)physics(m,dt);updateUI()}
-function physics(m,dt){let b=m.ball,g=1500;b.vy+=g*dt;b.vx+=m.wind*dt;b.x+=b.vx*dt;b.y+=b.vy*dt;b.life+=dt;GAME.trails.push({x:b.x,y:b.y,life:.35});GAME.trails=GAME.trails.slice(-28);let r=rim(),br=GAME.w*.018,prevY=b.y-b.vy*dt,prevX=b.x-b.vx*dt;let crossed=prevY<r.y&&b.y>=r.y;let crossX=prevX+(b.x-prevX)*((r.y-prevY)/Math.max(.001,b.y-prevY));if(b.state==='flight'&&b.vy>0&&((crossed&&crossX>r.x-r.r+4&&crossX<r.x+r.r*.45-4)||(Math.abs(b.x-r.x)<r.r&&Math.abs(b.y-r.y)<br+8))){return onScore(m,b)}let bbx=r.x+r.r*1.4;if(b.x+br>=bbx&&b.vx>0&&b.y>=r.y-r.r*2.5&&b.y<=r.y-r.r*.2&&b.state==='flight'){b.vx=-Math.abs(b.vx)*.65;b.x=bbx-br;b.bankHit=true;sfx.rim();GAME.shake=5}let rimL=r.x-r.r,rimR=r.x+r.r*.45;if(b.state==='flight'&&b.vy>0&&Math.abs(b.y-r.y)<br+5){if(Math.abs(b.x-rimL)<br+2||Math.abs(b.x-rimR)<br+2){b.vx=(b.x<r.x?Math.abs(b.vx):-Math.abs(b.vx))*.65;b.vy=-Math.abs(b.vy)*.55;b.rimHit=true;m.rim++;sfx.rim();GAME.shake=4}}if(b.life>.7&&Math.abs(b.x-r.x)<120&&Math.abs(b.y-r.y)<120&&Math.hypot(b.vx,b.vy)<220)return onMiss(m,b);if(b.y>GAME.h*.9||b.x<-60||b.x>GAME.w+60||b.life>5){if(b.state==='flight')onMiss(m,b);else m.ball=null}}
-function onScore(m,b){let pts=2,label=tr('swish'),kind='good';if(b.bankHit||b.bankAttempt||m.mode==='bank'){pts++;m.bank++;label=tr('bank');kind='gold'}if(b.perfect&&!b.rimHit){pts++;m.perfect++;label=tr('perfect');kind='gold'}if(b.rimHit)m.rim++;m.combo++;m.bestCombo=Math.max(m.bestCombo,m.combo);if(m.combo>=3)pts++;m.you+=pts;m.made++;b.state='scored';toast(label+(m.combo>=2?' Combo x'+m.combo:''),kind);sfx.swish();GAME.swish=1;m.ball=null}
-function onMiss(m,b){m.combo=0;m.ball=null;toast(tr('miss'),'bad');sfx.miss()}
-function updateUI(){let m=GAME.m;if(!m)return;$('#sb-time').textContent=Math.ceil(m.timeLeft);$('#sb-you').textContent=m.you;$('#sb-ai').textContent=m.ai;$('#rb-perfect').textContent=m.perfect;$('#rb-rim').textContent=m.rim;$('#rb-bank').textContent=m.bank;$('#rb-combo').textContent=m.combo;$('#rb-speed').textContent=m.ball?Math.round(Math.hypot(m.ball.vx,m.ball.vy)/10):0;$('#power-fill').style.inset=`0 ${100-m.power*100}% 0 0`;$('#power-perfect').style.left='60%';$('#power-perfect').style.width='12%';$('#sb-streak').hidden=m.combo<2;$('#sb-streak-n').textContent=m.combo;$('#rb-wind').hidden=m.mode!=='wind';$('#rb-wind-n').textContent=Math.round(Math.abs(m.wind||0));$('#rb-wind-arrow').textContent=(m.wind||0)>=0?'→':'←'}
-function drawBall(ctx,x,y,r){let grad=ctx.createRadialGradient(x-r*.3,y-r*.3,r*.1,x,y,r);grad.addColorStop(0,'#ffc185');grad.addColorStop(.55,'#ef6a1a');grad.addColorStop(1,'#7a2c08');ctx.fillStyle=grad;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#1a0c04';ctx.lineWidth=Math.max(1,r*.12);ctx.beginPath();ctx.moveTo(x-r,y);ctx.lineTo(x+r,y);ctx.moveTo(x,y-r);ctx.lineTo(x,y+r);ctx.stroke()}
-function drawHoop(ctx,cx,cy,scale){let w=scale;ctx.fillStyle='#3a2a1a';ctx.fillRect(cx+w*.7,cy-w*.6,w*.18,w*4);ctx.fillStyle='rgba(255,255,255,.92)';ctx.strokeStyle='#1a0c04';ctx.lineWidth=2;round(ctx,cx+w*.18,cy-w*.55,w*.7,w*1.4,4);ctx.fill();ctx.stroke();let rimY=cy+w*.4,rimL=cx-w*.55,rimR=cx+w*.18;ctx.strokeStyle='#ff5d22';ctx.lineWidth=Math.max(3,w*.08);ctx.beginPath();ctx.moveTo(rimL,rimY);ctx.lineTo(rimR,rimY);ctx.stroke();ctx.strokeStyle='rgba(255,255,255,.6)';ctx.lineWidth=1.2;for(let i=0;i<=9;i++){let xt=rimL+(rimR-rimL)*(i/9),xb=rimL+(rimR-rimL)*(.18+(i/9)*.66);ctx.beginPath();ctx.moveTo(xt,rimY);ctx.quadraticCurveTo((xt+xb)/2,rimY+w*.5,xb,rimY+w*.95);ctx.stroke()}}
-function drawPlayer(ctx,x,y,scale,o={}){let h=scale,phase=o.phase||0,charge=o.charge||0;ctx.save();ctx.translate(x,y);ctx.fillStyle='rgba(0,0,0,.45)';ctx.beginPath();ctx.ellipse(0,4,h*.18,h*.04,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#d8a070';round(ctx,-h*.1,-h*.37,h*.07,h*.35,4);ctx.fill();round(ctx,h*.03,-h*.37,h*.07,h*.35,4);ctx.fill();ctx.fillStyle='#ef6a1a';round(ctx,-h*.13,-h*.42+phase*h*.04,h*.26,h*.16,5);ctx.fill();ctx.save();ctx.translate(0,-h*.42+phase*h*.04);ctx.rotate(-phase*.15);ctx.fillStyle='#f4f1ea';round(ctx,-h*.13,-h*.32,h*.26,h*.32,6);ctx.fill();ctx.fillStyle='#ef6a1a';ctx.font=`700 ${h*.09}px monospace`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('10',0,-h*.18);ctx.strokeStyle='#d8a070';ctx.lineWidth=h*.05;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-h*.1,-h*.27);ctx.lineTo(-h*.05-phase*h*.1,-h*.18-phase*h*.2);ctx.moveTo(h*.1,-h*.27);let a=Math.PI*(-.3-phase*.8);ctx.lineTo(h*.1+Math.cos(a)*h*.32,-h*.27+Math.sin(a)*h*.32);ctx.stroke();ctx.fillStyle='#d8a070';ctx.beginPath();ctx.arc(0,-h*.41,h*.09,0,Math.PI*2);ctx.fill();ctx.fillStyle='#1a0c04';ctx.beginPath();ctx.arc(0,-h*.43,h*.083,Math.PI,2*Math.PI);ctx.fill();ctx.restore();if(charge>.05){let g=ctx.createRadialGradient(0,0,1,0,0,h*.25*charge);g.addColorStop(0,`rgba(255,176,102,${.6*charge})`);g.addColorStop(1,'rgba(255,176,102,0)');ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(0,0,h*.25*charge,h*.06*charge,0,0,Math.PI*2);ctx.fill()}ctx.restore()}
-function drawBg(ctx,w,h){let sky=ctx.createLinearGradient(0,0,0,h*.7);sky.addColorStop(0,'#0a0c14');sky.addColorStop(1,'#1a1220');ctx.fillStyle=sky;ctx.fillRect(0,0,w,h*.7);ctx.fillStyle='rgba(255,255,255,.04)';for(let i=0;i<40;i++){ctx.beginPath();ctx.arc(i*w/40,h*.6+Math.sin(i)*4,5,0,Math.PI*2);ctx.fill()}let floor=ctx.createLinearGradient(0,h*.7,0,h);floor.addColorStop(0,'#5a3018');floor.addColorStop(1,'#1a0c04');ctx.fillStyle=floor;ctx.fillRect(0,h*.7,w,h*.3);ctx.strokeStyle='rgba(255,255,255,.18)';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(w*.7,h*.95,w*.32,h*.18,0,Math.PI,2*Math.PI);ctx.stroke();ctx.beginPath();ctx.moveTo(w*.55,h*.83);ctx.lineTo(w*.85,h*.83);ctx.stroke()}
-function render(){let ctx=GAME.ctx,w=GAME.w,h=GAME.h,m=GAME.m;ctx.clearRect(0,0,w,h);ctx.save();if(GAME.shake>0)ctx.translate((Math.random()-.5)*GAME.shake,(Math.random()-.5)*GAME.shake);drawBg(ctx,w,h);let r=rim();drawHoop(ctx,r.x-r.r*.6,r.y-r.r*.4,r.r*1.6);let phase=0,charge=0;if(m){if(m.charging){phase=.55;charge=m.power}else if(m.ball&&m.ball.life<.25)phase=.8}drawPlayer(ctx,w*.22,h*.9,h*.55,{phase,charge});if(m&&!m.ball&&!m.ended){ctx.strokeStyle=`rgba(247,201,72,${.25+(m.power||0)*.5})`;ctx.lineWidth=2;ctx.setLineDash([4,6]);ctx.beginPath();let px=w*.22,py=h*.82-h*.32,ang=-Math.PI/2.4+(m.aimAngle*Math.PI/180),v=8+(m.power||.5)*12,pvx=Math.cos(ang)*v*60,pvy=Math.sin(ang)*v*60,x=px,y=py;for(let i=0;i<60;i++){pvy+=1500*.03;x+=pvx*.03;y+=pvy*.03;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);if(y>h*.92||x>w)break}ctx.stroke();ctx.setLineDash([])}GAME.trails.forEach(t=>{ctx.fillStyle=`rgba(255,176,102,${t.life})`;ctx.beginPath();ctx.arc(t.x,t.y,w*.012,0,Math.PI*2);ctx.fill();t.life-=.02});GAME.trails=GAME.trails.filter(t=>t.life>0);if(m&&m.ball)drawBall(ctx,m.ball.x,m.ball.y,w*.018);ctx.restore()}
-function tick(ts){if(!GAME.running)return;let dt=Math.min(.05,(ts-GAME.last)/1000);GAME.last=ts;if(GAME.m)step(dt);render();if(GAME.running)requestAnimationFrame(tick)}
-function drawCover(){let cv=$('#cover');if(!cv)return;let d=Math.min(devicePixelRatio||1,2),r=cv.getBoundingClientRect(),ctx=cv.getContext('2d');cv.width=r.width*d;cv.height=r.height*d;ctx.setTransform(d,0,0,d,0,0);let W=r.width,H=r.height;ctx.clearRect(0,0,W,H);drawBg(ctx,W,H);drawHoop(ctx,W*.78,H*.42,W*.06);drawPlayer(ctx,W*.32,H*.72,H*.34,{phase:.65,charge:1});let t=(performance.now()/1500)%1,bx=W*.32+(W*.78-W*.32)*t,by=(H*.72-H*.32)-Math.sin(t*Math.PI)*H*.22;drawBall(ctx,bx,by,H*.022);requestAnimationFrame(drawCover)}
-function round(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
-function renderHub(){ensureLeague();$('#kpi-level').textContent=state.level;$('#kpi-money').textContent=fmt(state.money);$('#kpi-fans').textContent=fmt(state.fans);$('#kpi-best').textContent=fmt(state.bestScore);$('#kpi-perfect').textContent=state.perfectShots;$('#kpi-rim').textContent=state.rimHits;$('#kpi-bank').textContent=state.bankShots;$('#kpi-combo').textContent=state.bestCombo;$('#xp-now').textContent=state.xp;$('#xp-need').textContent=xpNeed();$('#xp-fill').style.width=Math.min(100,state.xp/xpNeed()*100)+'%';$('#achv-list').innerHTML=['🏀 Primul coș','✨ 10 perfecte','🏦 Bank master','🔥 Combo x5'].map(x=>`<li><strong>${x}</strong><span class=pts>—</span></li>`).join('');$('#shop-list').innerHTML=['🎯 Asistență țintire','🌈 Arc îmbunătățit','💨 Scut de vânt'].map(x=>`<li><strong>${x}</strong><button disabled>soon</button></li>`).join('');$('#daily-list').innerHTML='<li><strong>Provocare zilnică</strong><div class=pbar><div class=pfill style="width:35%"></div></div></li>';$('#tour-bracket').innerHTML='<div class=muted>Turneu 3 runde</div>';let rows=state.league.standings.slice(0,10).map(s=>`<li class="${s.you?'you':''}"><span></span><strong>${s.name}</strong><span class=pts>${s.pts}</span></li>`).join('');$('#leader-list').innerHTML=rows;$('#league-list').innerHTML=rows}
-function ensureLeague(){if(!state.league.standings||!state.league.standings.length)state.league.standings=[{name:'⭐ Tu',pts:0,you:true},'DunkBot','HoopGPT','NetNinja','Splash9000','Ace-12'].map((x,i)=>typeof x==='string'?{name:x,pts:Math.floor(Math.random()*12)}:x).sort((a,b)=>b.pts-a.pts)}
-function bind(){let aim=$('#aim');aim.oninput=()=>{if(GAME.m)GAME.m.aimAngle=+aim.value};$('#aim-l').onclick=()=>{aim.value=Math.max(-45,+aim.value-3);aim.dispatchEvent(new Event('input'))};$('#aim-r').onclick=()=>{aim.value=Math.min(45,+aim.value+3);aim.dispatchEvent(new Event('input'))};let press=e=>{e.preventDefault();startShot()},rel=e=>{e.preventDefault();releaseShot()};['mousedown','touchstart'].forEach(ev=>$('#btn-shoot').addEventListener(ev,press,{passive:false}));['mouseup','mouseleave','touchend','touchcancel'].forEach(ev=>$('#btn-shoot').addEventListener(ev,rel,{passive:false}));document.onkeydown=e=>{if(e.repeat)return;if(e.code==='Space'){e.preventDefault();startShot()}if(e.key==='a'||e.key==='ArrowLeft'){$('#aim-l').click()}if(e.key==='d'||e.key==='ArrowRight'){$('#aim-r').click()}};document.onkeyup=e=>{if(e.code==='Space'){e.preventDefault();releaseShot()}};$('#btn-end').onclick=quit;$('#btn-play').onclick=()=>{startMatch();$('#arena').scrollIntoView({behavior:'smooth'})};$('#btn-hub').onclick=()=>{$('#hub').hidden=false;$('#hub').dataset.open='true';renderHub()};$('#hub-close').onclick=()=>{$('#hub').dataset.open='false'};$('#ov-go').onclick=startMatch;$('#ov-back').onclick=quit;$('#btn-sound').onclick=e=>{let v=e.currentTarget.getAttribute('aria-pressed')!=='false';e.currentTarget.setAttribute('aria-pressed',v?'false':'true');if(!v)sfx.click()};$('#btn-lang').onclick=()=>{lang=lang==='ro'?'en':'ro';localStorage.setItem('bvai.lang',lang);$('#lang-label').textContent=lang==='ro'?'EN':'RO'};$('#btn-help').onclick=()=>$('#help').showModal();$('#help-close').onclick=()=>$('#help').close();$('#btn-reset').onclick=()=>{if(confirm('Sigur ștergi progresul?')){localStorage.removeItem(KEY);state=load();renderHero();renderHub();toast('OK','good')}};$$('.tab').forEach(t=>t.onclick=()=>{$$('.tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');$$('.tab-panel').forEach(p=>p.classList.remove('active'));$(`.tab-panel[data-panel="${t.dataset.tab}"]`).classList.add('active')});$('#btn-tour').onclick=()=>{startMatch();$('#hub').dataset.open='false'}}
-function init(){document.body.dataset.lang=lang;$('#lang-label').textContent=lang==='ro'?'EN':'RO';$('#year').textContent=new Date().getFullYear();GAME.cv=$('#court');GAME.ctx=setupCanvas(GAME.cv);bind();renderHero();renderHub();drawCover();$('#ov-title').textContent='Start';$('#ov-msg').textContent='Țintește, ține apăsat pentru putere, eliberează lângă zona aurie.';render()}
-document.readyState==='loading'?document.addEventListener('DOMContentLoaded',init):init();
+(() => {
+  'use strict';
+
+  const $ = (selector) => document.querySelector(selector);
+  const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+  const KEY = 'bvai.state.v2';
+  const GRAVITY = 1450;
+
+  const defaults = {
+    level: 1,
+    xp: 0,
+    money: 0,
+    fans: 0,
+    bestScore: 0,
+    bestCombo: 0,
+    perfectShots: 0,
+    rimHits: 0,
+    bankShots: 0,
+    wins: 0,
+    losses: 0,
+    draws: 0,
+    league: { standings: [] }
+  };
+
+  let state = loadState();
+  let lang = localStorage.getItem('bvai.lang') || 'ro';
+  let soundOn = true;
+  let audioCtx = null;
+  let raf = 0;
+
+  const game = {
+    canvas: null,
+    ctx: null,
+    width: 900,
+    height: 540,
+    running: false,
+    last: 0,
+    match: null,
+    trails: []
+  };
+
+  function loadState() {
+    try {
+      return { ...defaults, ...(JSON.parse(localStorage.getItem(KEY)) || {}) };
+    } catch {
+      return { ...defaults };
+    }
+  }
+
+  function saveState() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch {}
+  }
+
+  function xpNeed() {
+    return Math.round(100 * Math.pow(1.35, state.level - 1));
+  }
+
+  function formatNumber(value) {
+    return Number(value || 0).toLocaleString(lang === 'ro' ? 'ro-RO' : 'en-US');
+  }
+
+  function setText(selector, value) {
+    const node = $(selector);
+    if (node) node.textContent = value;
+  }
+
+  function tone(type = 'click') {
+    if (!soundOn) return;
+    try {
+      audioCtx ||= new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const freq = { click: 420, score: 880, rim: 220, miss: 140, win: 720 }[type] || 420;
+      const now = audioCtx.currentTime;
+      osc.type = type === 'rim' ? 'square' : 'sine';
+      osc.frequency.setValueAtTime(freq, now);
+      gain.gain.setValueAtTime(0.06, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.14);
+    } catch {}
+  }
+
+  function toast(message, kind = '') {
+    const node = $('#toast');
+    if (!node) return;
+    node.textContent = message;
+    node.className = `toast ${kind}`.trim();
+    node.hidden = false;
+    requestAnimationFrame(() => node.classList.add('show'));
+    clearTimeout(toast.timer);
+    toast.timer = setTimeout(() => {
+      node.classList.remove('show');
+      setTimeout(() => { node.hidden = true; }, 260);
+    }, 1500);
+  }
+
+  function ensureLeague() {
+    if (state.league && Array.isArray(state.league.standings) && state.league.standings.length) return;
+    state.league = {
+      standings: [
+        { name: '⭐ Tu', pts: 0, you: true },
+        { name: 'DunkBot', pts: 11 },
+        { name: 'HoopGPT', pts: 9 },
+        { name: 'NetNinja', pts: 7 },
+        { name: 'Splash9000', pts: 6 },
+        { name: 'Ace-12', pts: 4 }
+      ]
+    };
+  }
+
+  function renderHero() {
+    setText('#hs-level', state.level);
+    setText('#hs-xp', formatNumber(state.xp));
+    setText('#hs-fans', formatNumber(state.fans));
+    setText('#hs-best', formatNumber(state.bestScore));
+  }
+
+  function renderHub() {
+    ensureLeague();
+    setText('#kpi-level', state.level);
+    setText('#kpi-money', formatNumber(state.money));
+    setText('#kpi-fans', formatNumber(state.fans));
+    setText('#kpi-best', formatNumber(state.bestScore));
+    setText('#kpi-perfect', state.perfectShots);
+    setText('#kpi-rim', state.rimHits);
+    setText('#kpi-bank', state.bankShots);
+    setText('#kpi-combo', state.bestCombo);
+    setText('#xp-now', state.xp);
+    setText('#xp-need', xpNeed());
+    const xpFill = $('#xp-fill');
+    if (xpFill) xpFill.style.width = `${Math.min(100, (state.xp / xpNeed()) * 100)}%`;
+
+    const achv = $('#achv-list');
+    if (achv) achv.innerHTML = ['🏀 Primul coș', '✨ 10 perfecte', '🏦 Bank master', '🔥 Combo x5'].map((item) => `<li><strong>${item}</strong><span class="pts">—</span></li>`).join('');
+
+    const shop = $('#shop-list');
+    if (shop) shop.innerHTML = ['🎯 Asistență țintire', '🌈 Arc îmbunătățit', '💨 Scut de vânt'].map((item) => `<li><strong>${item}</strong><button disabled>soon</button></li>`).join('');
+
+    const daily = $('#daily-list');
+    if (daily) daily.innerHTML = '<li><strong>Provocare zilnică</strong><div class="pbar"><div class="pfill" style="width:35%"></div></div></li>';
+
+    const tour = $('#tour-bracket');
+    if (tour) tour.innerHTML = '<div class="muted">Turneu 3 runde</div>';
+
+    const rows = state.league.standings
+      .slice(0, 10)
+      .map((row) => `<li class="${row.you ? 'you' : ''}"><span></span><strong>${row.name}</strong><span class="pts">${row.pts}</span></li>`)
+      .join('');
+    const leader = $('#leader-list');
+    const league = $('#league-list');
+    if (leader) leader.innerHTML = rows;
+    if (league) league.innerHTML = rows;
+  }
+
+  function setupCanvas() {
+    const canvas = $('#court');
+    if (!canvas) return false;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return false;
+    game.canvas = canvas;
+    game.ctx = ctx;
+
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      game.width = Math.max(1, rect.width);
+      game.height = Math.max(1, rect.height);
+      canvas.width = Math.floor(game.width * dpr);
+      canvas.height = Math.floor(game.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      draw();
+    };
+
+    resize();
+    window.addEventListener('resize', resize);
+    return true;
+  }
+
+  function newMatch() {
+    const mode = $('input[name="mode"]:checked')?.value || 'classic';
+    const diff = $('input[name="diff"]:checked')?.value || 'normal';
+    const time = Number($('input[name="time"]:checked')?.value || 60);
+    return {
+      mode,
+      diff,
+      timeLeft: time,
+      you: 0,
+      ai: 0,
+      perfect: 0,
+      rim: 0,
+      bank: 0,
+      combo: 0,
+      bestCombo: 0,
+      power: 0,
+      charging: false,
+      chargeStart: 0,
+      aimAngle: Number($('#aim')?.value || 0),
+      ball: null,
+      ended: false,
+      aiNext: 2.3,
+      wind: 0,
+      rimT: 0,
+      accuracy: { easy: 0.45, normal: 0.6, hard: 0.72, pro: 0.82 }[diff] || 0.6
+    };
+  }
+
+  function startMatch() {
+    if (!game.ctx && !setupCanvas()) return;
+    game.match = newMatch();
+    game.running = true;
+    game.trails = [];
+    game.last = performance.now();
+    const overlay = $('#overlay');
+    if (overlay) overlay.hidden = true;
+    setText('#sb-mode', $('input[name="mode"]:checked + span')?.textContent || 'Clasic');
+    setText('#sb-diff', $('input[name="diff"]:checked + span')?.textContent || 'Normal');
+    tone('click');
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(loop);
+  }
+
+  function endMatch(force = false) {
+    const match = game.match;
+    if (!match) return;
+    game.running = false;
+    cancelAnimationFrame(raf);
+
+    if (!force) {
+      const won = match.you > match.ai;
+      const drawMatch = match.you === match.ai;
+      const xp = 30 + match.you * 5 + (won ? 50 : drawMatch ? 20 : 0);
+      const money = 20 + match.you * 4 + (won ? 40 : 0);
+      const fans = 5 + match.you * 2 + (won ? 30 : 0);
+      state.bestScore = Math.max(state.bestScore, match.you);
+      state.bestCombo = Math.max(state.bestCombo, match.bestCombo);
+      state.perfectShots += match.perfect;
+      state.rimHits += match.rim;
+      state.bankShots += match.bank;
+      state.money += money;
+      state.fans += fans;
+      state.xp += xp;
+      while (state.xp >= xpNeed()) {
+        state.xp -= xpNeed();
+        state.level += 1;
+      }
+      if (won) state.wins += 1;
+      else if (drawMatch) state.draws += 1;
+      else state.losses += 1;
+      saveState();
+      renderHero();
+      renderHub();
+      setText('#ov-title', won ? 'Victorie!' : drawMatch ? 'Egal' : 'Înfrângere');
+      setText('#ov-msg', `+${xp} XP, +${money}$, +${fans} fani`);
+      tone(won ? 'win' : 'miss');
+    } else {
+      setText('#ov-title', 'Start');
+      setText('#ov-msg', 'Țintește, ține apăsat pentru putere, eliberează lângă zona aurie.');
+    }
+
+    game.match = null;
+    const overlay = $('#overlay');
+    if (overlay) overlay.hidden = false;
+    draw();
+  }
+
+  function rimPosition() {
+    const match = game.match;
+    let x = game.width * 0.82;
+    const y = game.height * 0.42;
+    if (match && match.mode === 'moving') x += Math.sin(match.rimT) * game.width * 0.07;
+    return { x, y, r: game.width * 0.035 };
+  }
+
+  function startShot() {
+    const match = game.match;
+    if (!match || match.ball || match.ended) return;
+    match.charging = true;
+    match.chargeStart = performance.now();
+    match.power = 0;
+  }
+
+  function releaseShot() {
+    const match = game.match;
+    if (!match || !match.charging) return;
+    match.charging = false;
+    if (match.ball || match.power < 0.08) {
+      match.power = 0;
+      return;
+    }
+
+    const playerX = game.width * 0.22;
+    const playerY = game.height * 0.82 - game.height * 0.32;
+    const angle = -Math.PI / 2.4 + (match.aimAngle * Math.PI / 180);
+    const velocity = 8 + match.power * 12;
+    match.ball = {
+      x: playerX,
+      y: playerY,
+      vx: Math.cos(angle) * velocity * 60,
+      vy: Math.sin(angle) * velocity * 60,
+      life: 0,
+      perfect: match.power >= 0.6 && match.power <= 0.72,
+      bankAttempt: Math.abs(match.aimAngle) > 18,
+      bankHit: false,
+      rimHit: false
+    };
+    match.power = 0;
+  }
+
+  function update(dt) {
+    const match = game.match;
+    if (!match) return;
+
+    if (match.charging) {
+      let p = ((performance.now() - match.chargeStart) / 1000) % 2;
+      if (p > 1) p = 2 - p;
+      match.power = p;
+    }
+
+    match.timeLeft -= dt;
+    if (match.timeLeft <= 0) {
+      match.timeLeft = 0;
+      endMatch(false);
+      return;
+    }
+
+    if (match.mode === 'wind') {
+      match.wind += (Math.random() - 0.5) * 120 * dt;
+      match.wind = Math.max(-90, Math.min(90, match.wind));
+    } else {
+      match.wind = 0;
+    }
+
+    if (match.mode === 'moving') match.rimT += dt * 1.2;
+
+    match.aiNext -= dt;
+    if (match.aiNext <= 0) {
+      match.aiNext = 2.2 + Math.random() * 2.3;
+      if (Math.random() < match.accuracy) match.ai += Math.random() < 0.15 ? 3 : 2;
+    }
+
+    if (match.ball) updateBall(match, match.ball, dt);
+    updateUi();
+  }
+
+  function updateBall(match, ball, dt) {
+    const previousX = ball.x;
+    const previousY = ball.y;
+    ball.vy += GRAVITY * dt;
+    ball.vx += match.wind * dt;
+    ball.x += ball.vx * dt;
+    ball.y += ball.vy * dt;
+    ball.life += dt;
+
+    game.trails.push({ x: ball.x, y: ball.y, life: 0.35 });
+    if (game.trails.length > 28) game.trails.shift();
+
+    const rim = rimPosition();
+    const ballRadius = game.width * 0.018;
+    const crossedRimY = previousY < rim.y && ball.y >= rim.y;
+    const t = (rim.y - previousY) / Math.max(0.001, ball.y - previousY);
+    const crossingX = previousX + (ball.x - previousX) * Math.max(0, Math.min(1, t));
+
+    const scoredByCrossing = crossedRimY && ball.vy > 0 && crossingX > rim.x - rim.r + 4 && crossingX < rim.x + rim.r * 0.45 - 4;
+    const scoredByPocket = ball.vy > 0 && Math.abs(ball.x - rim.x) < rim.r && Math.abs(ball.y - rim.y) < ballRadius + 8;
+    if (scoredByCrossing || scoredByPocket) {
+      score(match, ball);
+      return;
+    }
+
+    const boardX = rim.x + rim.r * 1.4;
+    const hitBackboard = ball.x + ballRadius >= boardX && ball.vx > 0 && ball.y >= rim.y - rim.r * 2.5 && ball.y <= rim.y - rim.r * 0.2;
+    if (hitBackboard) {
+      ball.vx = -Math.abs(ball.vx) * 0.65;
+      ball.x = boardX - ballRadius;
+      ball.bankHit = true;
+      tone('rim');
+    }
+
+    const rimLeft = rim.x - rim.r;
+    const rimRight = rim.x + rim.r * 0.45;
+    const hitRim = ball.vy > 0 && Math.abs(ball.y - rim.y) < ballRadius + 5 && (Math.abs(ball.x - rimLeft) < ballRadius + 2 || Math.abs(ball.x - rimRight) < ballRadius + 2);
+    if (hitRim && !ball.rimHit) {
+      ball.vx = (ball.x < rim.x ? Math.abs(ball.vx) : -Math.abs(ball.vx)) * 0.65;
+      ball.vy = -Math.abs(ball.vy) * 0.55;
+      ball.rimHit = true;
+      match.rim += 1;
+      tone('rim');
+    }
+
+    const stuckNearRim = ball.life > 0.7 && Math.abs(ball.x - rim.x) < 120 && Math.abs(ball.y - rim.y) < 120 && Math.hypot(ball.vx, ball.vy) < 220;
+    if (stuckNearRim || ball.y > game.height * 0.92 || ball.x < -60 || ball.x > game.width + 60 || ball.life > 5) {
+      miss(match);
+    }
+  }
+
+  function score(match, ball) {
+    let points = 2;
+    let label = 'SWISH!';
+    let kind = 'good';
+    if (ball.bankHit || ball.bankAttempt || match.mode === 'bank') {
+      points += 1;
+      match.bank += 1;
+      label = 'BANK!';
+      kind = 'gold';
+    }
+    if (ball.perfect && !ball.rimHit) {
+      points += 1;
+      match.perfect += 1;
+      label = 'PERFECT';
+      kind = 'gold';
+    }
+    match.combo += 1;
+    match.bestCombo = Math.max(match.bestCombo, match.combo);
+    if (match.combo >= 3) points += 1;
+    match.you += points;
+    match.ball = null;
+    toast(`${label}${match.combo >= 2 ? ` Combo x${match.combo}` : ''}`, kind);
+    tone('score');
+  }
+
+  function miss(match) {
+    match.combo = 0;
+    match.ball = null;
+    toast('Ratat', 'bad');
+    tone('miss');
+  }
+
+  function updateUi() {
+    const match = game.match;
+    if (!match) return;
+    setText('#sb-time', Math.ceil(match.timeLeft));
+    setText('#sb-you', match.you);
+    setText('#sb-ai', match.ai);
+    setText('#rb-perfect', match.perfect);
+    setText('#rb-rim', match.rim);
+    setText('#rb-bank', match.bank);
+    setText('#rb-combo', match.combo);
+    setText('#rb-speed', match.ball ? Math.round(Math.hypot(match.ball.vx, match.ball.vy) / 10) : 0);
+    const powerFill = $('#power-fill');
+    const powerPerfect = $('#power-perfect');
+    if (powerFill) powerFill.style.inset = `0 ${100 - match.power * 100}% 0 0`;
+    if (powerPerfect) {
+      powerPerfect.style.left = '60%';
+      powerPerfect.style.width = '12%';
+    }
+    const streak = $('#sb-streak');
+    if (streak) streak.hidden = match.combo < 2;
+    setText('#sb-streak-n', match.combo);
+    const wind = $('#rb-wind');
+    if (wind) wind.hidden = match.mode !== 'wind';
+    setText('#rb-wind-n', Math.round(Math.abs(match.wind || 0)));
+    setText('#rb-wind-arrow', (match.wind || 0) >= 0 ? '→' : '←');
+  }
+
+  function draw() {
+    if (!game.ctx) return;
+    const ctx = game.ctx;
+    const w = game.width;
+    const h = game.height;
+    const match = game.match;
+    ctx.clearRect(0, 0, w, h);
+    drawBackground(ctx, w, h);
+    const rim = rimPosition();
+    drawHoop(ctx, rim.x - rim.r * 0.6, rim.y - rim.r * 0.4, rim.r * 1.6);
+    drawPlayer(ctx, w * 0.22, h * 0.9, h * 0.55, match);
+    drawAimPreview(ctx, w, h, match);
+    drawTrails(ctx, w);
+    if (match && match.ball) drawBall(ctx, match.ball.x, match.ball.y, w * 0.018);
+  }
+
+  function drawBackground(ctx, w, h) {
+    const sky = ctx.createLinearGradient(0, 0, 0, h * 0.7);
+    sky.addColorStop(0, '#0a0c14');
+    sky.addColorStop(1, '#1a1220');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, w, h * 0.7);
+    ctx.fillStyle = 'rgba(255,255,255,.04)';
+    for (let i = 0; i < 40; i++) {
+      ctx.beginPath();
+      ctx.arc((i * w) / 40, h * 0.6 + Math.sin(i) * 4, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    const floor = ctx.createLinearGradient(0, h * 0.7, 0, h);
+    floor.addColorStop(0, '#5a3018');
+    floor.addColorStop(1, '#1a0c04');
+    ctx.fillStyle = floor;
+    ctx.fillRect(0, h * 0.7, w, h * 0.3);
+    ctx.strokeStyle = 'rgba(255,255,255,.18)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(w * 0.7, h * 0.95, w * 0.32, h * 0.18, 0, Math.PI, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(w * 0.55, h * 0.83);
+    ctx.lineTo(w * 0.85, h * 0.83);
+    ctx.stroke();
+  }
+
+  function drawHoop(ctx, cx, cy, scale) {
+    const width = scale;
+    ctx.fillStyle = '#3a2a1a';
+    ctx.fillRect(cx + width * 0.7, cy - width * 0.6, width * 0.18, width * 4);
+    ctx.fillStyle = 'rgba(255,255,255,.92)';
+    ctx.strokeStyle = '#1a0c04';
+    ctx.lineWidth = 2;
+    roundedRect(ctx, cx + width * 0.18, cy - width * 0.55, width * 0.7, width * 1.4, 4);
+    ctx.fill();
+    ctx.stroke();
+    const rimY = cy + width * 0.4;
+    const rimL = cx - width * 0.55;
+    const rimR = cx + width * 0.18;
+    ctx.strokeStyle = '#ff5d22';
+    ctx.lineWidth = Math.max(3, width * 0.08);
+    ctx.beginPath();
+    ctx.moveTo(rimL, rimY);
+    ctx.lineTo(rimR, rimY);
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,.6)';
+    ctx.lineWidth = 1.2;
+    for (let i = 0; i <= 9; i++) {
+      const topX = rimL + (rimR - rimL) * (i / 9);
+      const bottomX = rimL + (rimR - rimL) * (0.18 + (i / 9) * 0.66);
+      ctx.beginPath();
+      ctx.moveTo(topX, rimY);
+      ctx.quadraticCurveTo((topX + bottomX) / 2, rimY + width * 0.5, bottomX, rimY + width * 0.95);
+      ctx.stroke();
+    }
+  }
+
+  function drawPlayer(ctx, x, y, scale, match) {
+    const phase = match && match.charging ? 0.55 : match && match.ball && match.ball.life < 0.25 ? 0.8 : 0;
+    const charge = match && match.charging ? match.power : 0;
+    const h = scale;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.fillStyle = 'rgba(0,0,0,.45)';
+    ctx.beginPath();
+    ctx.ellipse(0, 4, h * 0.18, h * 0.04, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#d8a070';
+    roundedRect(ctx, -h * 0.1, -h * 0.37, h * 0.07, h * 0.35, 4);
+    ctx.fill();
+    roundedRect(ctx, h * 0.03, -h * 0.37, h * 0.07, h * 0.35, 4);
+    ctx.fill();
+    ctx.fillStyle = '#ef6a1a';
+    roundedRect(ctx, -h * 0.13, -h * 0.42 + phase * h * 0.04, h * 0.26, h * 0.16, 5);
+    ctx.fill();
+    ctx.save();
+    ctx.translate(0, -h * 0.42 + phase * h * 0.04);
+    ctx.rotate(-phase * 0.15);
+    ctx.fillStyle = '#f4f1ea';
+    roundedRect(ctx, -h * 0.13, -h * 0.32, h * 0.26, h * 0.32, 6);
+    ctx.fill();
+    ctx.fillStyle = '#ef6a1a';
+    ctx.font = `700 ${h * 0.09}px monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('10', 0, -h * 0.18);
+    ctx.strokeStyle = '#d8a070';
+    ctx.lineWidth = h * 0.05;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-h * 0.1, -h * 0.27);
+    ctx.lineTo(-h * 0.05 - phase * h * 0.1, -h * 0.18 - phase * h * 0.2);
+    ctx.moveTo(h * 0.1, -h * 0.27);
+    const armAngle = Math.PI * (-0.3 - phase * 0.8);
+    ctx.lineTo(h * 0.1 + Math.cos(armAngle) * h * 0.32, -h * 0.27 + Math.sin(armAngle) * h * 0.32);
+    ctx.stroke();
+    ctx.fillStyle = '#d8a070';
+    ctx.beginPath();
+    ctx.arc(0, -h * 0.41, h * 0.09, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#1a0c04';
+    ctx.beginPath();
+    ctx.arc(0, -h * 0.43, h * 0.083, Math.PI, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    if (charge > 0.05) {
+      const glow = ctx.createRadialGradient(0, 0, 1, 0, 0, h * 0.25 * charge);
+      glow.addColorStop(0, `rgba(255,176,102,${0.6 * charge})`);
+      glow.addColorStop(1, 'rgba(255,176,102,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, h * 0.25 * charge, h * 0.06 * charge, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawAimPreview(ctx, w, h, match) {
+    if (!match || match.ball || match.ended) return;
+    ctx.save();
+    ctx.strokeStyle = `rgba(247,201,72,${0.25 + (match.power || 0) * 0.5})`;
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 6]);
+    ctx.beginPath();
+    const px = w * 0.22;
+    const py = h * 0.82 - h * 0.32;
+    const angle = -Math.PI / 2.4 + (match.aimAngle * Math.PI / 180);
+    const velocity = 8 + (match.power || 0.5) * 12;
+    let vx = Math.cos(angle) * velocity * 60;
+    let vy = Math.sin(angle) * velocity * 60;
+    let x = px;
+    let y = py;
+    for (let i = 0; i < 60; i++) {
+      vy += GRAVITY * 0.03;
+      x += vx * 0.03;
+      y += vy * 0.03;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+      if (y > h * 0.92 || x > w) break;
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawTrails(ctx, w) {
+    game.trails.forEach((trail) => {
+      ctx.fillStyle = `rgba(255,176,102,${trail.life})`;
+      ctx.beginPath();
+      ctx.arc(trail.x, trail.y, w * 0.012, 0, Math.PI * 2);
+      ctx.fill();
+      trail.life -= 0.02;
+    });
+    game.trails = game.trails.filter((trail) => trail.life > 0);
+  }
+
+  function drawBall(ctx, x, y, radius) {
+    const gradient = ctx.createRadialGradient(x - radius * 0.3, y - radius * 0.3, radius * 0.1, x, y, radius);
+    gradient.addColorStop(0, '#ffc185');
+    gradient.addColorStop(0.55, '#ef6a1a');
+    gradient.addColorStop(1, '#7a2c08');
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#1a0c04';
+    ctx.lineWidth = Math.max(1, radius * 0.12);
+    ctx.beginPath();
+    ctx.moveTo(x - radius, y);
+    ctx.lineTo(x + radius, y);
+    ctx.moveTo(x, y - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.stroke();
+  }
+
+  function roundedRect(ctx, x, y, width, height, radius) {
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.arcTo(x + width, y, x + width, y + height, radius);
+    ctx.arcTo(x + width, y + height, x, y + height, radius);
+    ctx.arcTo(x, y + height, x, y, radius);
+    ctx.arcTo(x, y, x + width, y, radius);
+    ctx.closePath();
+  }
+
+  function loop(now) {
+    if (!game.running) return;
+    const dt = Math.min(0.05, (now - game.last) / 1000 || 0.016);
+    game.last = now;
+    update(dt);
+    draw();
+    if (game.running) raf = requestAnimationFrame(loop);
+  }
+
+  function drawCover() {
+    const canvas = $('#cover');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+    canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const w = rect.width;
+    const h = rect.height;
+    ctx.clearRect(0, 0, w, h);
+    drawBackground(ctx, w, h);
+    drawHoop(ctx, w * 0.78, h * 0.42, w * 0.06);
+    drawPlayer(ctx, w * 0.32, h * 0.72, h * 0.34, { charging: true, power: 1 });
+    const progress = (performance.now() / 1500) % 1;
+    drawBall(ctx, w * 0.32 + (w * 0.46) * progress, (h * 0.72 - h * 0.32) - Math.sin(progress * Math.PI) * h * 0.22, h * 0.022);
+    requestAnimationFrame(drawCover);
+  }
+
+  function bind() {
+    const aim = $('#aim');
+    if (aim) {
+      aim.addEventListener('input', () => {
+        if (game.match) game.match.aimAngle = Number(aim.value || 0);
+      });
+    }
+
+    $('#aim-l')?.addEventListener('click', () => {
+      if (!aim) return;
+      aim.value = String(Math.max(-45, Number(aim.value) - 3));
+      aim.dispatchEvent(new Event('input'));
+    });
+
+    $('#aim-r')?.addEventListener('click', () => {
+      if (!aim) return;
+      aim.value = String(Math.min(45, Number(aim.value) + 3));
+      aim.dispatchEvent(new Event('input'));
+    });
+
+    const shoot = $('#btn-shoot');
+    const press = (event) => { event.preventDefault(); startShot(); };
+    const release = (event) => { event.preventDefault(); releaseShot(); };
+    shoot?.addEventListener('pointerdown', press, { passive: false });
+    window.addEventListener('pointerup', release, { passive: false });
+    window.addEventListener('pointercancel', release, { passive: false });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.repeat) return;
+      if (event.code === 'Space') { event.preventDefault(); startShot(); }
+      if (event.key === 'a' || event.key === 'A' || event.key === 'ArrowLeft') $('#aim-l')?.click();
+      if (event.key === 'd' || event.key === 'D' || event.key === 'ArrowRight') $('#aim-r')?.click();
+    });
+
+    document.addEventListener('keyup', (event) => {
+      if (event.code === 'Space') { event.preventDefault(); releaseShot(); }
+    });
+
+    $('#btn-play')?.addEventListener('click', () => {
+      startMatch();
+      $('#arena')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    $('#ov-go')?.addEventListener('click', startMatch);
+    $('#btn-end')?.addEventListener('click', () => endMatch(true));
+    $('#ov-back')?.addEventListener('click', () => endMatch(true));
+
+    $('#btn-hub')?.addEventListener('click', () => {
+      const hub = $('#hub');
+      if (!hub) return;
+      hub.hidden = false;
+      hub.dataset.open = 'true';
+      renderHub();
+    });
+
+    $('#hub-close')?.addEventListener('click', () => {
+      const hub = $('#hub');
+      if (!hub) return;
+      hub.dataset.open = 'false';
+      setTimeout(() => { hub.hidden = true; }, 350);
+    });
+
+    $$('.tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        $$('.tab').forEach((node) => node.classList.remove('active'));
+        tab.classList.add('active');
+        $$('.tab-panel').forEach((panel) => panel.classList.remove('active'));
+        $(`.tab-panel[data-panel="${tab.dataset.tab}"]`)?.classList.add('active');
+      });
+    });
+
+    $('#btn-tour')?.addEventListener('click', () => {
+      const hub = $('#hub');
+      if (hub) {
+        hub.dataset.open = 'false';
+        setTimeout(() => { hub.hidden = true; }, 350);
+      }
+      startMatch();
+    });
+
+    $('#btn-sound')?.addEventListener('click', (event) => {
+      soundOn = !soundOn;
+      event.currentTarget.setAttribute('aria-pressed', soundOn ? 'true' : 'false');
+      if (soundOn) tone('click');
+    });
+
+    $('#btn-lang')?.addEventListener('click', () => {
+      lang = lang === 'ro' ? 'en' : 'ro';
+      localStorage.setItem('bvai.lang', lang);
+      setText('#lang-label', lang === 'ro' ? 'EN' : 'RO');
+    });
+
+    $('#btn-help')?.addEventListener('click', () => $('#help')?.showModal());
+    $('#help-close')?.addEventListener('click', () => $('#help')?.close());
+
+    $('#btn-reset')?.addEventListener('click', () => {
+      if (!confirm('Sigur ștergi progresul?')) return;
+      localStorage.removeItem(KEY);
+      state = loadState();
+      renderHero();
+      renderHub();
+      toast('OK', 'good');
+    });
+  }
+
+  function init() {
+    setText('#lang-label', lang === 'ro' ? 'EN' : 'RO');
+    setText('#year', new Date().getFullYear());
+    ensureLeague();
+    setupCanvas();
+    bind();
+    renderHero();
+    renderHub();
+    setText('#ov-title', 'Start');
+    setText('#ov-msg', 'Țintește, ține apăsat pentru putere, eliberează lângă zona aurie.');
+    draw();
+    drawCover();
+    console.info('Basket vs AI Enhanced Pro loaded: pro-2');
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 })();
