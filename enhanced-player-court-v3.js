@@ -6,6 +6,7 @@
   const DPR = Math.min(window.devicePixelRatio || 1, 2);
   let time = 0;
   let arenaFlash = 0;
+  let shake = { x: 0, y: 0, intensity: 0 };
   const particles = [];
   const balls = [];
 
@@ -273,13 +274,22 @@
     const colors = type === 'perfect' ? ['#ffd23b', '#ff8c2a', '#4ad9ff', '#ffffff'] : color === 'cyan' ? ['#4ad9ff', '#ffffff', '#a3e8ff'] : ['#ff5d8f', '#ffffff', '#ffb0c8'];
     const count = type === 'perfect' ? 30 : 14;
     for(let i = 0; i < count; i++){ const a = Math.random() * Math.PI * 2, sp = 2 + Math.random() * 6; particles.push({ x:x0, y:y0, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp-1, life:1, decay:0.018+Math.random()*0.02, size:2+Math.random()*3.5, color:colors[Math.floor(Math.random()*colors.length)], g:0.18 }); }
-    if(type === 'perfect') arenaFlash = 0.4;
+    if(type === 'perfect'){ arenaFlash = 0.4; shake.intensity = 8; }
+    else { shake.intensity = 3; }
   }
   function updateParticles(){ for(let i = particles.length - 1; i >= 0; i--){ const p = particles[i]; p.x += p.vx; p.y += p.vy; p.vy += p.g; p.life -= p.decay; if(p.life <= 0) particles.splice(i, 1); } }
   function drawParticles(x){ for(const p of particles){ x.save(); x.globalAlpha = p.life; x.fillStyle = p.color; x.shadowColor = p.color; x.shadowBlur = 8; x.beginPath(); x.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2); x.fill(); x.restore(); } }
 
   function frame(t){
     time = t / 1000;
+    if(shake.intensity > 0.1){
+      shake.x = (Math.random() - 0.5) * shake.intensity;
+      shake.y = (Math.random() - 0.5) * shake.intensity;
+      shake.intensity *= 0.85;
+      stage.style.transform = `translate(${shake.x}px, ${shake.y}px)`;
+    } else {
+      stage.style.transform = '';
+    }
     for(const p of [player, ai]){
       if(p.shooting){
         p.shootProgress += 0.022;
