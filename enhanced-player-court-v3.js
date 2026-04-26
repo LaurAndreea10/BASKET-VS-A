@@ -12,16 +12,57 @@
   const hoopAI = { x: .78, y: .50, color: '#4ad9ff', size: .65, label: 'AI' };
 
   function injectCss(){
-    if(document.getElementById('bvai-v3-graphics-css')) return;
-    const style = document.createElement('style');
-    style.id = 'bvai-v3-graphics-css';
+    let style = document.getElementById('bvai-v3-graphics-css');
+    if(!style){
+      style = document.createElement('style');
+      style.id = 'bvai-v3-graphics-css';
+      document.head.appendChild(style);
+    }
     style.textContent = `
-      .court-wrap{position:relative;overflow:hidden;}
-      #court{opacity:0!important;}
-      #bvai-v3-graphics{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1;pointer-events:none;border-radius:inherit;}
-      .court-wrap>.overlay,.court-wrap>.toast{z-index:5;}
+      html,body{overflow-x:hidden;}
+      .arena{width:100%;max-width:1240px;margin-left:auto!important;margin-right:auto!important;}
+      .court-wrap{
+        position:relative!important;
+        overflow:hidden!important;
+        width:100%!important;
+        aspect-ratio:16/9!important;
+        min-height:clamp(300px,52vw,620px)!important;
+        max-height:72vh!important;
+        border-radius:22px!important;
+        transform:none!important;
+        contain:layout paint size;
+      }
+      #court{
+        position:absolute!important;
+        inset:0!important;
+        width:100%!important;
+        height:100%!important;
+        opacity:.01!important;
+        z-index:2!important;
+        pointer-events:auto!important;
+      }
+      #bvai-v3-graphics{
+        position:absolute!important;
+        inset:0!important;
+        width:100%!important;
+        height:100%!important;
+        display:block!important;
+        z-index:1!important;
+        pointer-events:none!important;
+        border-radius:inherit!important;
+        transform:none!important;
+      }
+      .court-wrap>.overlay{z-index:6!important;}
+      .court-wrap>.toast{z-index:7!important;}
+      .scoreboard,.ribbon,.controls{width:100%;}
+      @media(max-width:640px){
+        .arena{padding-left:12px!important;padding-right:12px!important;gap:10px!important;}
+        .court-wrap{aspect-ratio:16/11!important;min-height:300px!important;max-height:58vh!important;}
+        .scoreboard{grid-template-columns:1fr auto 1fr!important;padding:12px!important;}
+        .ribbon{gap:8px!important;}
+        .controls{padding:12px!important;}
+      }
     `;
-    document.head.appendChild(style);
   }
 
   function init(){
@@ -36,7 +77,7 @@
     }
     ctx = canvas.getContext('2d');
     resize();
-    window.addEventListener('resize', resize);
+    window.addEventListener('resize', resize, { passive:true });
     bindButtons();
     requestAnimationFrame(frame);
   }
@@ -45,10 +86,8 @@
     const shoot = document.getElementById('btn-shoot');
     if(shoot && !shoot.dataset.v3Graphics){
       shoot.dataset.v3Graphics = '1';
-      ['click','pointerup','touchend'].forEach(ev => shoot.addEventListener(ev, () => shootPlayer(false), { passive:true }));
+      shoot.addEventListener('click', () => shootPlayer(false));
     }
-    const modeInputs = Array.from(document.querySelectorAll('input[name="mode"],input[name="diff"]'));
-    modeInputs.forEach(input => input.addEventListener('change', () => { balls.length = 0; particles.length = 0; }));
     const scoreAI = document.getElementById('sb-ai');
     if(scoreAI && !scoreAI.dataset.v3Graphics){
       scoreAI.dataset.v3Graphics = '1';
@@ -60,10 +99,9 @@
     if(!canvas || !wrap) return;
     const r = wrap.getBoundingClientRect();
     W = Math.max(1, r.width); H = Math.max(1, r.height);
-    canvas.width = W * DPR; canvas.height = H * DPR;
-    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    canvas.width = Math.floor(W * DPR); canvas.height = Math.floor(H * DPR);
+    canvas.style.width = '100%'; canvas.style.height = '100%';
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    drawArena();
   }
 
   function shootPlayer(miss){
