@@ -3,6 +3,53 @@
   const $ = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 
+  const MODE_LABELS = {
+    classic:'Clasic', blitz:'Blitz', moving:'Coș mobil', wind:'Vânt haotic', bank:'Bank lab', sudden:'Sudden Death', practice:'Practice', bossrush:'Boss Rush'
+  };
+  const DIFF_LABELS = { easy:'Ușor', normal:'Normal', hard:'Greu', pro:'Pro' };
+
+  function selected(name, fallback){
+    return $(`input[name="${name}"]:checked`)?.value || localStorage.getItem(`selected_${name}`) || fallback;
+  }
+
+  function persistSelection(name){
+    $$(`input[name="${name}"]`).forEach(input => {
+      if(input.dataset.pro17ModeBound) return;
+      input.dataset.pro17ModeBound = '1';
+      input.addEventListener('change', () => {
+        if(input.checked){
+          try{ localStorage.setItem(`selected_${name}`, input.value); }catch{}
+          applySelectionsToUi();
+        }
+      });
+    });
+  }
+
+  function restoreSelection(name, fallback){
+    const saved = localStorage.getItem(`selected_${name}`) || fallback;
+    const input = $(`input[name="${name}"][value="${saved}"]`);
+    if(input) input.checked = true;
+  }
+
+  function applySelectionsToUi(){
+    const mode = selected('mode','classic');
+    const diff = selected('diff','normal');
+    const time = selected('time','60');
+    const modeEl = $('#sb-mode'); if(modeEl) modeEl.textContent = MODE_LABELS[mode] || mode;
+    const diffEl = $('#sb-diff'); if(diffEl) diffEl.textContent = DIFF_LABELS[diff] || diff;
+    const timeEl = $('#sb-time'); if(timeEl && !document.body.dataset.matchRunning) timeEl.textContent = mode === 'blitz' ? '30' : time;
+    document.body.dataset.selectedMode = mode;
+    document.body.dataset.selectedDiff = diff;
+    document.body.dataset.selectedTime = time;
+  }
+
+  function forceSelectionsBeforeStart(){
+    restoreSelection('mode', localStorage.getItem('selected_mode') || document.body.dataset.selectedMode || 'classic');
+    restoreSelection('diff', localStorage.getItem('selected_diff') || document.body.dataset.selectedDiff || 'normal');
+    restoreSelection('time', localStorage.getItem('selected_time') || document.body.dataset.selectedTime || '60');
+    applySelectionsToUi();
+  }
+
   function setOpponent(name){
     const label = $('.sb-side.ai .sb-label') || $('.pro11-ai-name');
     if(label) label.textContent = name;
@@ -27,6 +74,7 @@
     else { setOpponent('Rookie Bot'); localStorage.setItem('tournamentRound','1'); }
     closeAllBlockingLayers();
     setTimeout(() => {
+      forceSelectionsBeforeStart();
       const go = $('#ov-go');
       const play = $('#btn-play');
       if(go && !go.offsetParent && play) play.click();
@@ -56,15 +104,34 @@
   function bind(){
     window.nextOpponent = nextOpponent;
     window.closeEndScreen = closeAllBlockingLayers;
+    persistSelection('mode');
+    persistSelection('diff');
+    persistSelection('time');
+    restoreSelection('mode','classic');
+    restoreSelection('diff','normal');
+    restoreSelection('time','60');
+    applySelectionsToUi();
+
     document.addEventListener('click', (ev) => {
       const btn = ev.target.closest('button,.btn,[role="button"]');
       if(!btn) return;
       const text = (btn.textContent || '').trim().toLowerCase();
+      const isStart = btn.id === 'btn-play' || btn.id === 'ov-go' || text.includes('joacă meci') || text === 'start';
+      if(isStart){
+        forceSelectionsBeforeStart();
+        document.body.dataset.matchRunning = '1';
+        setTimeout(applySelectionsToUi, 80);
+      }
       if(text.includes('următorul adversar') || text.includes('urmatorul adversar') || text.includes('joacă următorul meci') || text.includes('joaca urmatorul meci') || btn.dataset.nextOpponent === '1'){
         ev.preventDefault();
         ev.stopImmediatePropagation();
         nextOpponent();
       }
+    }, true);
+
+    document.addEventListener('change', (ev) => {
+      const el = ev.target;
+      if(el?.matches?.('input[name="mode"],input[name="diff"],input[name="time"]')) applySelectionsToUi();
     }, true);
   }
 
