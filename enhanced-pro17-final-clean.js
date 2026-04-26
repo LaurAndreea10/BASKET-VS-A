@@ -68,7 +68,16 @@
     new MutationObserver(()=>{ const txt=t.textContent||''; if(/combo x5|on fire/i.test(txt)) popup(); }).observe(t,{childList:true,subtree:true});
   }
 
-  function run(){ brand(); buttons(); score(); kpis(); comp(); leaders(); watch(); try{localStorage.setItem('bvai.pro17.finalClean','true')}catch{} }
+  function loadV3Graphics(){
+    if (document.getElementById('bvai-player-court-v3-loader')) return;
+    const s = document.createElement('script');
+    s.id = 'bvai-player-court-v3-loader';
+    s.src = 'enhanced-player-court-v3.js?v=player-court-v3';
+    s.defer = true;
+    document.body.appendChild(s);
+  }
+
+  function run(){ brand(); buttons(); score(); kpis(); comp(); leaders(); watch(); loadV3Graphics(); try{localStorage.setItem('bvai.pro17.finalClean','true')}catch{} }
 
   document.addEventListener('DOMContentLoaded', () => {
     run();
