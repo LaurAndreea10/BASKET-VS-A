@@ -1,0 +1,84 @@
+/* Accent color customizer — Pro 17 Final */
+:root {
+  --accent: var(--hot, #ff6a1a);
+  --accent-2: var(--hot-2, #ffb066);
+  --accent-soft: rgba(255, 106, 26, .14);
+  --accent-ring: rgba(255, 106, 26, .42);
+}
+
+body[data-accent="orange"] { --accent:#ff6a1a; --accent-2:#ffb066; --accent-soft:rgba(255,106,26,.14); --accent-ring:rgba(255,106,26,.42); }
+body[data-accent="blue"] { --accent:#4f8cff; --accent-2:#9ec3ff; --accent-soft:rgba(79,140,255,.14); --accent-ring:rgba(79,140,255,.42); }
+body[data-accent="green"] { --accent:#35d07f; --accent-2:#97f0bf; --accent-soft:rgba(53,208,127,.14); --accent-ring:rgba(53,208,127,.42); }
+body[data-accent="purple"] { --accent:#9b5cff; --accent-2:#d0b3ff; --accent-soft:rgba(155,92,255,.14); --accent-ring:rgba(155,92,255,.42); }
+body[data-accent="pink"] { --accent:#ff4fa3; --accent-2:#ffafd5; --accent-soft:rgba(255,79,163,.14); --accent-ring:rgba(255,79,163,.42); }
+
+body[data-accent] .btn.primary,
+body[data-accent] .pro15-btn,
+body[data-accent] .shop button:not(:disabled) {
+  background: linear-gradient(180deg, var(--accent-2), var(--accent)) !important;
+  box-shadow: 0 12px 26px -10px var(--accent-ring), inset 0 1px 0 rgba(255,255,255,.38) !important;
+}
+
+body[data-accent] .brand-text strong span,
+body[data-accent] .display::after,
+body[data-accent] .sb-side.me .sb-label,
+body[data-accent] .pro13-rank-pill,
+body[data-accent] .p17fc-score .dash,
+body[data-accent] .p17fc-leader li span:before,
+body[data-accent] .pro17-leader li span:before {
+  color: var(--accent-2) !important;
+}
+
+body[data-accent] .eyebrow .dot,
+body[data-accent] .xp-fill,
+body[data-accent] .power-fill {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2)) !important;
+}
+
+body[data-accent] .p17fc-score,
+body[data-accent] .p17fc-section,
+body[data-accent] .pro17-section,
+body[data-accent] .pro16-section {
+  border-color: var(--accent-ring) !important;
+}
+
+.color-picker-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.color-picker-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.color-swatch {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 2px solid rgba(255,255,255,.18);
+  box-shadow: 0 10px 24px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.22);
+  cursor: pointer;
+  transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+.color-swatch:hover { transform: translateY(-2px); }
+.color-swatch.active {
+  border-color: #fff;
+  box-shadow: 0 0 0 4px var(--accent-soft), 0 12px 28px rgba(0,0,0,.36);
+}
+
+.color-swatch[data-accent="orange"] { background: linear-gradient(135deg,#ffb066,#ff6a1a); }
+.color-swatch[data-accent="blue"] { background: linear-gradient(135deg,#9ec3ff,#4f8cff); }
+.color-swatch[data-accent="green"] { background: linear-gradient(135deg,#97f0bf,#35d07f); }
+.color-swatch[data-accent="purple"] { background: linear-gradient(135deg,#d0b3ff,#9b5cff); }
+.color-swatch[data-accent="pink"] { background: linear-gradient(135deg,#ffafd5,#ff4fa3); }
+
+.color-picker-note {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 13px;
+  line-height: 1.45;
+}
