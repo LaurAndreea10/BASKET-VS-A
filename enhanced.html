@@ -10,7 +10,7 @@
   <meta property="og:title" content="Basket vs AI — Zero Rebuild">
   <meta property="og:description" content="Aruncă perfect, urcă în ligă și învinge adversari AI cu personalitate.">
   <meta property="og:image" content="https://laurandreea10.github.io/BASKET-VS-AI/og-cover.svg">
-  <link rel="stylesheet" href="zero.css?v=zero-1">
+  <link rel="stylesheet" href="zero.css?v=zero-2">
 </head>
 <body>
   <header class="top">
@@ -66,13 +66,19 @@
     <canvas id="court"></canvas>
     <canvas id="action"></canvas>
     <canvas id="fx"></canvas>
-    <div class="perfect"><b>PERFECT</b><div class="rail"></div><div class="zone"></div></div>
+    <div class="perfect"><b id="perfectText">PERFECT</b><div class="rail"></div><div class="zone"></div></div>
   </main>
 
   <section class="controls">
-    <span class="label">Țintă</span>
-    <input class="aim" id="aim" type="range" min="-45" max="45" value="8">
-    <div class="power"><div class="fill" id="fill"></div></div>
+    <div class="controlBlock aimBlock">
+      <div class="controlHead"><span class="label">Țintă / unghi</span><span class="readout" id="aimReadout">8°</span></div>
+      <input class="aim" id="aim" type="range" min="-45" max="45" value="8">
+    </div>
+    <div class="controlBlock powerBlock">
+      <div class="controlHead"><span class="label">Putere / dozaj</span><span class="readout" id="powerReadout">0% · pregătit</span></div>
+      <div class="power"><div class="fill" id="fill"></div><div class="sweet"></div></div>
+      <div class="powerData"><span>Putere <b id="dataPower">0%</b></span><span>Unghi <b id="dataAngle">8°</b></span><span>Status <b id="dataStatus">Așteaptă</b></span></div>
+    </div>
     <button class="primary" id="shoot">ARUNCĂ</button>
     <button id="restart">Start / Restart</button>
   </section>
@@ -99,7 +105,7 @@
   </aside>
 
   <div class="end" id="end"><h2 id="endTitle">Victorie!</h2><p id="endText"></p><div class="actions"><button class="primary" id="again">Joacă din nou</button><button id="next">Următorul adversar</button><button class="ghost" id="endHub">Hub</button></div></div>
-  <p class="note"><b>Zero rebuild:</b> pagina încarcă doar <code>zero.css</code> și <code>zero.js</code>. Niciun script Pro vechi.</p>
-  <script src="zero.js?v=zero-1" defer></script>
+  <p class="note"><b>Zero rebuild:</b> pagina încarcă doar <code>zero.css</code> și <code>zero.js</code>. Bara din dreapta afișează puterea reală a aruncării.</p>
+  <script src="zero.js?v=zero-2" defer></script>
 </body>
 </html>
