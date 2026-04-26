@@ -1,287 +1,219 @@
 (() => {
   'use strict';
 
-  const COURT_ID = 'premium-court-overlay';
-  const NOTE_ID = 'premium-court-note';
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 
-  function $(selector, root = document) {
-    return root.querySelector(selector);
+  const style = document.createElement('style');
+  style.id = 'stable-public-hotfix-style';
+  style.textContent = `
+    body::before{content:'STABLE HUB PATCH';position:fixed;right:10px;bottom:10px;z-index:2147483647;background:#ff7a2a;color:#111;padding:6px 10px;border-radius:999px;font:800 11px system-ui;opacity:.85;pointer-events:none}
+    #hub{z-index:2147482500!important;pointer-events:auto!important;max-height:92vh!important;overflow:auto!important}
+    #hub:not([hidden]){display:block!important}
+    .stable-hub-clean .tab-panel:not(.active),.stable-hub-clean [data-panel]:not(.active){display:none!important}
+    .stable-hub-clean .stable-card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:12px 0}
+    .stable-hub-clean .stable-card{background:rgba(17,23,34,.92);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:15px;min-height:112px}
+    .stable-hub-clean .stable-card strong{display:block;font-size:18px;margin-bottom:7px;color:#f4f7ff}
+    .stable-hub-clean .stable-card p{margin:0 0 10px;color:rgba(244,247,255,.62);line-height:1.35}
+    .stable-hub-clean .stable-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px}
+    .stable-hub-clean .stable-pill{display:inline-flex;border:1px solid rgba(255,210,59,.42);background:rgba(255,210,59,.1);color:#ffd23b;border-radius:999px;padding:6px 10px;font-weight:900;font-size:12px;letter-spacing:.05em}
+    .stable-hub-clean .stable-btn{border:1px solid rgba(255,122,42,.7);background:#ff7a2a;color:#111;border-radius:12px;padding:8px 12px;font-weight:900;cursor:pointer}
+    .stable-hub-clean .stable-section{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025));border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:16px;margin:14px 0}
+    .stable-hub-clean .stable-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:12px 0}
+    .stable-hub-clean .stable-kpi{background:rgba(17,23,34,.92);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:12px}
+    .stable-hub-clean .stable-kpi span{display:block;color:rgba(244,247,255,.55);font-size:11px;text-transform:uppercase;letter-spacing:.14em}.stable-hub-clean .stable-kpi b{font-size:26px;color:#f4f7ff}
+    .stable-hub-clean .stable-progress{height:8px;background:#0a0f18;border-radius:999px;overflow:hidden;margin-top:8px}.stable-hub-clean .stable-progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#4ad9ff,#ff7a2a)}
+    .perfect-shot-guide{position:absolute;left:0;right:0;bottom:116px;height:32px;z-index:40;pointer-events:none;display:flex;align-items:center;justify-content:center}
+    .perfect-shot-guide .rail{width:min(82%,760px);height:10px;border-radius:999px;background:linear-gradient(90deg,#5fa7ff 0%,#5fa7ff 48%,#ffd23b 48%,#ffd23b 56%,#ff7a2a 56%,#ff7a2a 100%);box-shadow:0 0 0 1px rgba(255,255,255,.16),0 0 18px rgba(255,122,42,.25)}
+    .perfect-shot-guide .zone{position:absolute;width:min(12%,110px);height:24px;border:2px solid #ffd23b;border-radius:999px;box-shadow:0 0 16px rgba(255,210,59,.65)}
+    .perfect-shot-guide .txt{position:absolute;top:-16px;color:#ffd23b;font:900 11px system-ui;letter-spacing:.12em;text-transform:uppercase;text-shadow:0 0 10px rgba(255,210,59,.6)}
+  `;
+  document.head.appendChild(style);
+
+  function normalizeText(text) {
+    return (text || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   }
 
-  function fitCanvas(canvas, target) {
-    const rect = target.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.max(1, Math.floor(rect.width * dpr));
-    canvas.height = Math.max(1, Math.floor(rect.height * dpr));
-    canvas.style.width = `${rect.width}px`;
-    canvas.style.height = `${rect.height}px`;
-    const ctx = canvas.getContext('2d');
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    return { ctx, W: rect.width, H: rect.height };
+  function openHub(tab = 'career') {
+    const hub = $('#hub');
+    if (!hub) return;
+    hub.hidden = false;
+    hub.removeAttribute('hidden');
+    hub.classList.add('stable-hub-clean');
+    hub.style.display = 'block';
+    hub.style.pointerEvents = 'auto';
+    hub.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    setTab(tab);
   }
 
-  function roundRect(ctx, x, y, w, h, r) {
-    const rr = Math.min(r, w / 2, h / 2);
-    ctx.beginPath();
-    ctx.moveTo(x + rr, y);
-    ctx.lineTo(x + w - rr, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + rr);
-    ctx.lineTo(x + w, y + h - rr);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - rr, y + h);
-    ctx.lineTo(x + rr, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - rr);
-    ctx.lineTo(x, y + rr);
-    ctx.quadraticCurveTo(x, y, x + rr, y);
-    ctx.closePath();
+  function closeHub() {
+    const hub = $('#hub');
+    if (!hub) return;
+    hub.hidden = true;
+    hub.setAttribute('hidden', '');
+    hub.style.display = 'none';
   }
 
-  function drawHardwood(ctx, W, H) {
-    const fy = H * 0.68;
-    const floor = ctx.createLinearGradient(0, fy, 0, H);
-    floor.addColorStop(0, '#7a3510');
-    floor.addColorStop(0.3, '#9b4c20');
-    floor.addColorStop(0.65, '#7a3510');
-    floor.addColorStop(1, '#341404');
-    ctx.fillStyle = floor;
-    ctx.fillRect(0, fy, W, H - fy);
-
-    ctx.save();
-    ctx.strokeStyle = 'rgba(0,0,0,.12)';
-    ctx.lineWidth = 0.85;
-    for (let y = fy + 6; y < H; y += 11) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(W, y);
-      ctx.stroke();
-    }
-    ctx.strokeStyle = 'rgba(255,255,255,.045)';
-    for (let x = 0; x < W; x += 58) {
-      ctx.beginPath();
-      ctx.moveTo(x, fy);
-      ctx.lineTo(x - W * 0.035, H);
-      ctx.stroke();
-    }
-    ctx.restore();
-
-    ctx.save();
-    ctx.strokeStyle = 'rgba(255,255,255,.32)';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(W * 0.28, fy, W * 0.44, H * 0.2);
-    ctx.beginPath();
-    ctx.arc(W * 0.5, fy + H * 0.19, H * 0.14, Math.PI * 1.08, Math.PI * 1.92);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(W * 0.5, fy, H * 0.3, Math.PI * 1.07, Math.PI * 1.93);
-    ctx.stroke();
-    ctx.strokeStyle = 'rgba(255,255,255,.15)';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(W * 0.5, fy, H * 0.1, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.restore();
+  function setTab(tab) {
+    const hub = $('#hub');
+    if (!hub) return;
+    const panels = $$('[data-panel],.tab-panel', hub);
+    const tabs = $$('.tab,[data-tab]', hub);
+    tabs.forEach(btn => {
+      const btab = btn.dataset.tab || normalizeText(btn.textContent).split(/\s+/)[0];
+      btn.classList.toggle('active', btab === tab);
+    });
+    panels.forEach(panel => {
+      const ptab = panel.dataset.panel || panel.id || '';
+      panel.classList.toggle('active', ptab === tab);
+      panel.hidden = ptab !== tab;
+      panel.style.display = ptab === tab ? 'block' : 'none';
+    });
   }
 
-  function drawArena(ctx, W, H) {
-    ctx.clearRect(0, 0, W, H);
-    const bg = ctx.createLinearGradient(0, 0, 0, H);
-    bg.addColorStop(0, '#050810');
-    bg.addColorStop(0.48, '#0c1125');
-    bg.addColorStop(1, '#150e08');
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, W, H);
-
-    ctx.save();
-    ctx.globalAlpha = 0.09;
-    for (let i = 0; i < 4; i++) {
-      const lx = W * (0.14 + i * 0.25);
-      const beam = ctx.createRadialGradient(lx, -20, 8, lx, -20, H * 0.85);
-      beam.addColorStop(0, '#fff5e8');
-      beam.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = beam;
-      ctx.fillRect(0, 0, W, H * 0.85);
-    }
-    ctx.restore();
-
-    ctx.save();
-    ctx.globalAlpha = 0.22;
-    ctx.fillStyle = '#0b1021';
-    for (let i = 0; i < 26; i++) {
-      const x = (i / 26) * W;
-      const y = H * 0.58 + Math.sin(i * 1.3) * 5;
-      ctx.beginPath();
-      ctx.arc(x, y, 4 + (i % 4), 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.restore();
-
-    drawHardwood(ctx, W, H);
+  function card(title, desc, price, button = 'Cumpără') {
+    return `<article class="stable-card"><strong>${title}</strong><p>${desc}</p><div class="stable-row"><span class="stable-pill">${price}</span><button type="button" class="stable-btn">${button}</button></div></article>`;
   }
 
-  function drawHoop(ctx, hx, hy, hr, rimColor, rimGlow, blue = false) {
-    const bx = hx - hr * 1.4;
-    const by = hy - hr * 2.0;
-    const bw = hr * 2.8;
-    const bh = hr * 1.55;
-    const r = Math.max(5, hr * 0.22);
+  function cleanHubPanels() {
+    const hub = $('#hub');
+    if (!hub) return;
+    hub.classList.add('stable-hub-clean');
 
-    ctx.save();
-    ctx.shadowColor = blue ? 'rgba(59,130,246,.3)' : 'rgba(255,210,150,.22)';
-    ctx.shadowBlur = 18;
-    ctx.fillStyle = blue ? 'rgba(10,20,90,.28)' : 'rgba(210,225,255,.14)';
-    ctx.strokeStyle = blue ? 'rgba(96,165,250,.72)' : 'rgba(220,235,255,.92)';
-    ctx.lineWidth = Math.max(2, hr * 0.1);
-    roundRect(ctx, bx, by, bw, bh, r);
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = 'rgba(255,255,255,.08)';
-    ctx.beginPath();
-    ctx.moveTo(bx + r, by + 2);
-    ctx.lineTo(bx + bw * 0.42, by + 2);
-    ctx.lineTo(bx + bw * 0.32, by + bh * 0.44);
-    ctx.lineTo(bx + r, by + bh * 0.44);
-    ctx.closePath();
-    ctx.fill();
-
-    if (!blue) {
-      ctx.strokeStyle = 'rgba(249,115,22,.82)';
-      ctx.lineWidth = Math.max(1.5, hr * 0.07);
-      ctx.strokeRect(hx - hr * 0.46, by + bh * 0.1, hr * 0.92, bh * 0.75);
+    const career = $('[data-panel="career"]', hub);
+    if (career) {
+      career.innerHTML = `
+        <section class="stable-section"><h3>Identitate</h3><div style="display:grid;grid-template-columns:84px 1fr;gap:16px;align-items:center"><div style="width:84px;height:84px;border-radius:22px;background:rgba(255,210,59,.15);border:1px solid rgba(255,210,59,.35);display:grid;place-items:center;font-size:42px">⛹️‍♀️</div><div><h2>Laura #10</h2><p>Nivel 1-2: Rookie · Nivel 3-5: Street Player · Nivel 6-9: Pro · Nivel 10-14: MVP · Nivel 15+: Legend</p><span class="stable-pill">XP 0 / 100</span></div></div></section>
+        <section class="stable-section"><h3>Profil jucător</h3><div class="stable-card-grid"><div class="stable-card"><strong>Gen</strong><p>Fată</p></div><div class="stable-card"><strong>Nume</strong><p>Laura</p></div><div class="stable-card"><strong>Număr tricou</strong><p>10</p></div></div><p>Se salvează automat și apare pe tricou în joc.</p></section>
+        <div class="stable-kpis"><div class="stable-kpi"><span>Nivel</span><b>1</b></div><div class="stable-kpi"><span>Bani</span><b>150</b></div><div class="stable-kpi"><span>Fani</span><b>0</b></div><div class="stable-kpi"><span>Best</span><b>0</b></div><div class="stable-kpi"><span>Perfecte</span><b>0</b></div><div class="stable-kpi"><span>Inel</span><b>0</b></div><div class="stable-kpi"><span>Bank</span><b>0</b></div><div class="stable-kpi"><span>Combo max</span><b>0</b></div></div>
+        <section class="stable-section"><h3>Realizări</h3><div class="stable-card-grid"><div class="stable-card"><strong>🏀 First Bucket</strong><p>Marchează primul coș.</p><span class="stable-pill">Locked</span></div><div class="stable-card"><strong>🔥 On Fire</strong><p>Fă combo x5.</p><span class="stable-pill">Locked</span></div><div class="stable-card"><strong>🏦 Bank Artist</strong><p>10 bank shots total.</p><span class="stable-pill">Locked</span></div><div class="stable-card"><strong>👑 AI Crusher</strong><p>Câștigă pe Pro.</p><span class="stable-pill">Locked</span></div><div class="stable-card"><strong>🏆 Tournament King</strong><p>Câștigă turneul.</p><span class="stable-pill">Locked</span></div><div class="stable-card"><strong>🌟 Legend</strong><p>Ajungi la nivel 10.</p><span class="stable-pill">Locked</span></div></div></section>
+        <section class="stable-section"><h3>Settings</h3><div class="stable-card-grid"><div class="stable-card"><strong>Sunet</strong><span class="stable-pill">ON</span></div><div class="stable-card"><strong>Vibrație</strong><span class="stable-pill">ON</span></div><div class="stable-card"><strong>Efecte</strong><span class="stable-pill">HIGH</span></div><div class="stable-card"><strong>Limbă</strong><span class="stable-pill">RO</span></div></div><button type="button" class="stable-btn" id="stable-reset-progress">RESET PROGRES</button></section>
+      `;
     }
 
-    ctx.strokeStyle = blue ? 'rgba(96,165,250,.38)' : 'rgba(200,215,240,.42)';
-    ctx.lineWidth = Math.max(2, hr * 0.1);
-    ctx.beginPath();
-    ctx.moveTo(hx, by + bh);
-    ctx.lineTo(hx, hy);
-    ctx.stroke();
-
-    ctx.shadowColor = rimGlow;
-    ctx.shadowBlur = 18;
-    ctx.strokeStyle = rimColor;
-    ctx.lineWidth = Math.max(5, hr * 0.22);
-    ctx.beginPath();
-    ctx.ellipse(hx, hy, hr, hr * 0.3, 0, 0, Math.PI * 2);
-    ctx.stroke();
-
-    ctx.shadowBlur = 0;
-    ctx.strokeStyle = blue ? 'rgba(96,165,250,.72)' : 'rgba(255,176,90,.85)';
-    ctx.lineWidth = Math.max(2, hr * 0.1);
-    ctx.beginPath();
-    ctx.ellipse(hx, hy, hr * 0.88, hr * 0.26, 0, 0, Math.PI * 2);
-    ctx.stroke();
-
-    for (let i = 0; i < 10; i++) {
-      const a = (i / 10) * Math.PI * 2;
-      const nx = hx + Math.cos(a) * hr;
-      const ny = hy + Math.sin(a) * hr * 0.3;
-      ctx.beginPath();
-      ctx.moveTo(nx, ny);
-      ctx.quadraticCurveTo(hx + Math.cos(a) * hr * 0.42, ny + hr * 0.9, hx, hy + hr * 1.45);
-      ctx.strokeStyle = blue ? 'rgba(120,170,255,.22)' : 'rgba(255,255,255,.28)';
-      ctx.lineWidth = 0.9;
-      ctx.stroke();
+    const shop = $('[data-panel="shop"]', hub);
+    if (shop) {
+      shop.innerHTML = `
+        <section class="stable-section"><h3>Shop real — upgrade-uri cumpărabile</h3><div class="stable-card-grid">
+          ${card('Perfect Assist Lv.1','Zona aurie crește cu +5% per nivel.','Lv 0/5 · 120$')}
+          ${card('Power Control','Bara de putere se mișcă mai lent.','Lv 0/5 · 150$')}
+          ${card('Wind Shield','Vântul afectează mai puțin mingea.','Lv 0/5 · 140$')}
+          ${card('Bank Master','Primești bonus mai mare la bank shot.','Lv 0/4 · 180$')}
+          ${card('Clutch Mode','Ultimele 10 secunde pot dubla scorul.','Lv 0/3 · 220$')}
+        </div></section>
+        <section class="stable-section"><h3>Mingi</h3><div class="stable-card-grid">
+          ${card('Classic Ball','Mingea standard.','Owned','Echipat')}
+          ${card('🏀 Neon Ball','Look arcade luminos.','220$')}
+          ${card('🔥 Fire Ball','Perfectă pentru combo-uri.','360$')}
+          ${card('🥇 Gold Ball','Skin premium de status.','520$')}
+          ${card('🌌 Galaxy Ball','Ediție cosmică premium.','680$')}
+        </div></section>
+        <section class="stable-section"><h3>Terenuri și trail-uri</h3><div class="stable-card-grid">
+          ${card('Arena','Sala de bază.','Owned','Echipat')}
+          ${card('🏙️ Street Court','Teren urban, contrast puternic.','260$')}
+          ${card('🌃 Night Court','Cinematic dark mode.','320$')}
+          ${card('🔥 Flame Trail','Flacără la aruncare.','300$')}
+          ${card('🧊 Ice Trail','Trail rece.','300$')}
+          ${card('✨ Star Trail','Scântei stelare.','460$')}
+        </div></section>
+      `;
     }
 
-    for (let i = 0; i < 3; i++) {
-      ctx.beginPath();
-      ctx.arc(hx, hy + hr * (0.3 + i * 0.35), hr * (0.85 - i * 0.25), 0, Math.PI * 2);
-      ctx.strokeStyle = blue ? 'rgba(100,160,255,.1)' : 'rgba(255,255,255,.1)';
-      ctx.lineWidth = 0.8;
-      ctx.stroke();
+    const leader = $('[data-panel="leader"]', hub);
+    if (leader) {
+      leader.innerHTML = `
+        <section class="stable-section"><h3>Clasament</h3><div class="stable-card-grid"><div class="stable-card"><strong>Laura League</strong><p>12</p></div><div class="stable-card"><strong>Rookie Bot</strong><p>10</p></div><div class="stable-card"><strong>Sniper AI</strong><p>8</p></div><div class="stable-card"><strong>Bank Boss</strong><p>6</p></div></div><p>Leaderboard-ul salvează local scorul, data, modul și dificultatea.</p></section>
+      `;
     }
-    ctx.restore();
+
+    const comp = $('[data-panel="comp"]', hub);
+    if (comp) {
+      comp.innerHTML = `
+        <section class="stable-section"><h3>Daily Missions</h3><p>Daily Streak: 0 zile 🔥 · Total azi +480 bani</p><div class="stable-card-grid"><div class="stable-card"><strong>⬜ Marchează 3 bank shots</strong><p>0 / 3 · +90 bani</p><div class="stable-progress"><i></i></div></div><div class="stable-card"><strong>⬜ Câștigă un meci pe Greu</strong><p>0 / 1 · +120 bani</p><div class="stable-progress"><i></i></div></div><div class="stable-card"><strong>⬜ Fă combo x5</strong><p>0 / 5 · +110 bani</p><div class="stable-progress"><i></i></div></div><div class="stable-card"><strong>⬜ Bate AI-ul la 10 puncte diferență</strong><p>0 / 1 · +160 bani</p><div class="stable-progress"><i></i></div></div></div></section>
+        <section class="stable-section"><h3>Turneu</h3><div class="stable-card-grid"><div class="stable-card"><strong>▶ Runda 1 — Rookie Bot</strong><p>Curentă</p></div><div class="stable-card"><strong>🔒 Runda 2 — Sniper AI</strong><p>Blocată</p></div><div class="stable-card"><strong>🔒 Finală — Legend AI</strong><p>Deblocată după runda 2</p></div></div></section>
+        <section class="stable-section"><h3>Practice Goals</h3><div class="stable-card-grid"><div class="stable-card"><strong>⬜ 3 perfect shots</strong><p>Recompensă: +25 XP</p></div><div class="stable-card"><strong>⬜ 2 bank shots</strong><p>Învață ricoșeul din panou.</p></div><div class="stable-card"><strong>⬜ Combo x3</strong><p>Ține seria de coșuri.</p></div></div></section>
+        <section class="stable-section"><h3>Boss Rush</h3><p>Rookie Bot → Sniper AI → Bank Boss → Legend AI</p><p>O singură viață. Recompensă: +500 bani, +100 fani, badge Boss Slayer.</p><button type="button" class="stable-btn" id="stable-next-match">Joacă următorul meci</button></section>
+      `;
+    }
+
+    setTab('career');
   }
 
-  function drawBall(ctx, x, y, br, inFlight) {
-    ctx.save();
-    ctx.fillStyle = 'rgba(0,0,0,.28)';
-    ctx.beginPath();
-    ctx.ellipse(x + br * 0.5, y + br * 0.65, br * 0.9, br * 0.28, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(inFlight ? performance.now() / 200 : 0);
-    if (inFlight) {
-      ctx.shadowColor = 'rgba(249,115,22,.55)';
-      ctx.shadowBlur = br * 0.7;
-    }
-    const grd = ctx.createRadialGradient(-br * 0.35, -br * 0.35, br * 0.08, 0, 0, br);
-    grd.addColorStop(0, '#ffa95a');
-    grd.addColorStop(0.45, '#e05500');
-    grd.addColorStop(1, '#7a1d00');
-    ctx.beginPath();
-    ctx.arc(0, 0, br, 0, Math.PI * 2);
-    ctx.fillStyle = grd;
-    ctx.fill();
-    ctx.shadowBlur = 0;
-    ctx.strokeStyle = 'rgba(0,0,0,.45)';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-    ctx.strokeStyle = 'rgba(0,0,0,.38)';
-    ctx.beginPath();
-    ctx.moveTo(-br, 0);
-    ctx.lineTo(br, 0);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(0, 0, br * 0.58, 0, Math.PI, false);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(0, 0, br * 0.58, Math.PI, Math.PI * 2, false);
-    ctx.stroke();
-    ctx.fillStyle = 'rgba(255,255,255,.2)';
-    ctx.beginPath();
-    ctx.ellipse(-br * 0.3, -br * 0.32, br * 0.28, br * 0.18, -0.4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
+  function addPerfectGuide() {
+    const wrap = $('.court-wrap') || $('.arena');
+    if (!wrap || $('.perfect-shot-guide', wrap)) return;
+    const guide = document.createElement('div');
+    guide.className = 'perfect-shot-guide';
+    guide.innerHTML = '<div class="txt">PERFECT</div><div class="rail"></div><div class="zone"></div>';
+    wrap.appendChild(guide);
   }
 
-  function drawOverlay(canvas, wrap) {
-    const { ctx, W, H } = fitCanvas(canvas, wrap);
-    drawArena(ctx, W, H);
-    drawHoop(ctx, W * 0.77, H * 0.34, Math.max(18, W * 0.035), '#cc4400', 'rgba(255,100,40,.8)', false);
-    drawHoop(ctx, W * 0.22, H * 0.36, Math.max(14, W * 0.028), '#1a4a8a', 'rgba(59,130,246,.6)', true);
-    ctx.save();
-    ctx.font = 'bold 11px Inter Tight, DM Sans, sans-serif';
-    ctx.fillStyle = 'rgba(59,130,246,.7)';
-    ctx.textAlign = 'center';
-    ctx.fillText('AI', W * 0.22, H * 0.36 - Math.max(14, W * 0.028) * 2.3);
-    ctx.restore();
-    drawBall(ctx, W * 0.37, H * 0.56, Math.max(10, W * 0.016), true);
-  }
-
-  function setup() {
-    const wrap = $('.court-wrap');
-    if (!wrap || $(`#${COURT_ID}`)) return;
-    const canvas = document.createElement('canvas');
-    canvas.id = COURT_ID;
-    canvas.className = 'court-graphics-layer';
-    wrap.prepend(canvas);
-
-    const note = document.createElement('div');
-    note.id = NOTE_ID;
-    note.className = 'premium-court-note';
-    note.textContent = 'Premium court graphics';
-    wrap.appendChild(note);
-
-    document.body.classList.add('premium-graphics-ready');
-
-    let raf = 0;
-    const render = () => {
-      drawOverlay(canvas, wrap);
-      raf = requestAnimationFrame(render);
+  function patchShootingDistance() {
+    const court = $('#court');
+    if (!court) return;
+    window.BVAI_SHOT_FIX = {
+      playerX: 0.34,
+      playerY: 0.78,
+      hoopX: 0.72,
+      hoopY: 0.34,
+      minPower: 0.58,
+      perfectMin: 0.48,
+      perfectMax: 0.56
     };
-    render();
+    const aim = $('#aim');
+    if (aim) aim.value = '8';
 
-    const observer = new ResizeObserver(() => drawOverlay(canvas, wrap));
-    observer.observe(wrap);
-
-    window.addEventListener('pagehide', () => cancelAnimationFrame(raf), { once: true });
+    document.addEventListener('pointerdown', (ev) => {
+      const btn = ev.target.closest('#btn-shoot,#shoot,.big');
+      if (!btn) return;
+      const fill = $('#power-fill') || $('#fill');
+      if (fill) fill.style.width = '52%';
+    }, true);
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setup);
-  else setup();
+  function bindHubButtons() {
+    document.addEventListener('click', (ev) => {
+      const btn = ev.target.closest('button,a,[role="button"]');
+      if (!btn) return;
+      const text = normalizeText(btn.textContent);
+      if (btn.id === 'btn-hub' || btn.id === 'btnHub' || text.includes('hub') || text.includes('deschide hub')) {
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+        cleanHubPanels();
+        openHub('career');
+      }
+      if (btn.id === 'hub-close' || btn.id === 'closeHub' || text === '✕' || text === 'x') {
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+        closeHub();
+      }
+      if (btn.dataset.tab) {
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+        setTab(btn.dataset.tab);
+      }
+      if (text.includes('reseteaza misiuni') || text.includes('reset progres')) {
+        localStorage.removeItem('bvaiStableHub');
+        localStorage.removeItem('basketVsAiProgress');
+        cleanHubPanels();
+        openHub('comp');
+      }
+      if (text.includes('joaca urmatorul meci') || text.includes('urmatorul adversar')) {
+        cleanHubPanels();
+        const mode = $('input[name="mode"][value="classic"]');
+        if (mode) mode.checked = true;
+      }
+    }, true);
+  }
+
+  function init() {
+    cleanHubPanels();
+    addPerfectGuide();
+    patchShootingDistance();
+    bindHubButtons();
+    console.info('Stable public hub/gameplay hotfix loaded');
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 })();
