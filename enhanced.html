@@ -4,109 +4,40 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#050810">
-  <title>Basket vs AI — Zero Rebuild</title>
-  <meta name="description" content="Basket vs AI refăcut de la zero: joc stabil, hub jucător, shop, clasament și competiții.">
+  <title>Basket vs AI — Stable v1</title>
+  <meta name="description" content="Basket vs AI: joc arcade stabil cu hub jucător, shop, clasament, competiții și adversari AI.">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <meta property="og:title" content="Basket vs AI — Zero Rebuild">
+  <meta property="og:title" content="Basket vs AI — Stable v1">
   <meta property="og:description" content="Aruncă perfect, urcă în ligă și învinge adversari AI cu personalitate.">
   <meta property="og:image" content="https://laurandreea10.github.io/BASKET-VS-AI/og-cover.svg">
-  <link rel="stylesheet" href="zero.css?v=zero-2">
+  <link rel="stylesheet" href="zero.css?v=stable-v1">
 </head>
 <body>
   <header class="top">
-    <div class="brand">
-      <img class="logo" src="logo.svg" alt="Basket vs AI logo">
-      <div>
-        <h1 class="heroTitle">Învinge AI-ul.<br>Construiește-ți legenda<i>.</i></h1>
-        <p class="heroText">Aruncă perfect, urcă în ligă, deblochează upgrade-uri și învinge adversari AI cu personalitate.</p>
-        <p><button class="primary" id="play">▶ Joacă meci</button> <button class="ghost" id="openHub">🏆 Deschide hub</button></p>
-      </div>
-    </div>
-    <div class="score">
-      <div class="pill"><small>TU</small><b id="scoreP">0</b></div>
-      <div class="timer"><span id="timer">60</span>s</div>
-      <div class="pill ai"><small id="aiName">Rookie Bot</small><b id="scoreAI">0</b></div>
-    </div>
+    <div class="brand"><img class="logo" src="logo.svg" alt="Basket vs AI logo"><div><h1 class="heroTitle">Învinge AI-ul.<br>Construiește-ți legenda<i>.</i></h1><p class="heroText">Aruncă perfect, urcă în ligă, deblochează upgrade-uri și învinge adversari AI cu personalitate.</p><p><button class="primary" id="play">▶ Joacă meci</button> <button class="ghost" id="openHub">🏆 Deschide hub</button></p></div></div>
+    <div class="score"><div class="pill"><small>TU</small><b id="scoreP">0</b></div><div class="timer"><span id="timer">60</span>s</div><div class="pill ai"><small id="aiName">Rookie Bot</small><b id="scoreAI">0</b></div></div>
   </header>
 
-  <section class="cover">
-    <img src="og-cover.svg" alt="Basket vs AI cover">
-    <aside class="identityFloat">
-      <h3>Identitate</h3>
-      <strong>Laura <em>#10</em></strong>
-      <p>Nivel 1 • Rookie</p>
-      <div class="row"><span>XP</span><b>0 / 100</b></div>
-      <div class="xpbar"><i></i></div>
-      <div class="row"><span>Fani</span><b>0</b></div>
-    </aside>
-  </section>
+  <section class="cover"><img src="og-cover.svg" alt="Basket vs AI cover"><aside class="identityFloat"><h3>Identitate</h3><strong>Laura <em>#10</em></strong><p>Nivel 1 • Rookie</p><div class="row"><span>XP</span><b>0 / 100</b></div><div class="xpbar"><i></i></div><div class="row"><span>Fani</span><b>0</b></div></aside></section>
 
   <section class="setup">
-    <div class="group">
-      <strong>Mod</strong>
-      <label class="chip"><input name="mode" value="classic" type="radio" checked><span>Clasic</span></label>
-      <label class="chip"><input name="mode" value="blitz" type="radio"><span>Blitz</span></label>
-      <label class="chip"><input name="mode" value="moving" type="radio"><span>Coș mobil</span></label>
-      <label class="chip"><input name="mode" value="wind" type="radio"><span>Vânt haotic</span></label>
-      <label class="chip"><input name="mode" value="bank" type="radio"><span>Bank lab</span></label>
-      <label class="chip"><input name="mode" value="sudden" type="radio"><span>Sudden Death</span></label>
-      <label class="chip"><input name="mode" value="practice" type="radio"><span>Practice</span></label>
-      <label class="chip"><input name="mode" value="bossrush" type="radio"><span>Boss Rush</span></label>
-    </div>
-    <div class="group">
-      <strong>Timp</strong>
-      <label class="chip"><input name="dur" value="30" type="radio"><span>30s</span></label>
-      <label class="chip"><input name="dur" value="60" type="radio" checked><span>60s</span></label>
-      <label class="chip"><input name="dur" value="90" type="radio"><span>90s</span></label>
-    </div>
+    <div class="group"><strong>Mod</strong><label class="chip"><input name="mode" value="classic" type="radio" checked><span>Clasic</span></label><label class="chip"><input name="mode" value="blitz" type="radio"><span>Blitz</span></label><label class="chip"><input name="mode" value="moving" type="radio"><span>Coș mobil</span></label><label class="chip"><input name="mode" value="wind" type="radio"><span>Vânt haotic</span></label><label class="chip"><input name="mode" value="bank" type="radio"><span>Bank lab</span></label><label class="chip"><input name="mode" value="sudden" type="radio"><span>Sudden Death</span></label><label class="chip"><input name="mode" value="practice" type="radio"><span>Practice</span></label><label class="chip"><input name="mode" value="bossrush" type="radio"><span>Boss Rush</span></label></div>
+    <div class="group"><strong>Timp</strong><label class="chip"><input name="dur" value="30" type="radio"><span>30s</span></label><label class="chip"><input name="dur" value="60" type="radio" checked><span>60s</span></label><label class="chip"><input name="dur" value="90" type="radio"><span>90s</span></label></div>
   </section>
 
-  <main class="arena" id="arena">
-    <div class="hud"><span class="modeTag" id="modeTag">Clasic · Rookie Bot</span><span class="windTag" id="windTag">Vânt 0</span></div>
-    <canvas id="court"></canvas>
-    <canvas id="action"></canvas>
-    <canvas id="fx"></canvas>
-    <div class="perfect"><b id="perfectText">PERFECT</b><div class="rail"></div><div class="zone"></div></div>
-  </main>
+  <main class="arena" id="arena"><div class="hud"><span class="modeTag" id="modeTag">Clasic · Rookie Bot</span><span class="windTag" id="windTag">Vânt 0</span></div><canvas id="court"></canvas><canvas id="action"></canvas><canvas id="fx"></canvas><div class="perfect"><b id="perfectText">PERFECT</b><div class="rail"></div><div class="zone"></div></div></main>
 
-  <section class="controls">
-    <div class="controlBlock aimBlock">
-      <div class="controlHead"><span class="label">Țintă / unghi</span><span class="readout" id="aimReadout">8°</span></div>
-      <input class="aim" id="aim" type="range" min="-45" max="45" value="8">
-    </div>
-    <div class="controlBlock powerBlock">
-      <div class="controlHead"><span class="label">Putere / dozaj</span><span class="readout" id="powerReadout">0% · pregătit</span></div>
-      <div class="power"><div class="fill" id="fill"></div><div class="sweet"></div></div>
-      <div class="powerData"><span>Putere <b id="dataPower">0%</b></span><span>Unghi <b id="dataAngle">8°</b></span><span>Status <b id="dataStatus">Așteaptă</b></span></div>
-    </div>
-    <button class="primary" id="shoot">ARUNCĂ</button>
-    <button id="restart">Start / Restart</button>
-  </section>
+  <section class="controls"><div class="controlBlock aimBlock"><div class="controlHead"><span class="label">Țintă / unghi</span><span class="readout" id="aimReadout">8°</span></div><input class="aim" id="aim" type="range" min="-45" max="45" value="8"></div><div class="controlBlock powerBlock"><div class="controlHead"><span class="label">Putere / dozaj</span><span class="readout" id="powerReadout">0% · pregătit</span></div><div class="power"><div class="fill" id="fill"></div><div class="sweet"></div></div><div class="powerData"><span>Putere <b id="dataPower">0%</b></span><span>Unghi <b id="dataAngle">8°</b></span><span>Status <b id="dataStatus">Așteaptă</b></span></div></div><button class="primary" id="shoot">ARUNCĂ</button><button id="restart">Start / Restart</button></section>
 
-  <aside class="hub" id="hub">
-    <div class="hubHead"><h2>Hub jucător</h2><button class="ghost" id="closeHub">✕</button></div>
-    <nav class="tabs">
-      <button class="tab active" data-tab="career">Carieră</button>
-      <button class="tab" data-tab="shop">Shop</button>
-      <button class="tab" data-tab="leader">Clasament</button>
-      <button class="tab" data-tab="comp">Competiții</button>
-    </nav>
-
-    <section class="panel active" id="career">
-      <div class="section"><h3>Identitate</h3><div class="grid"><div class="card"><strong>⛹️‍♀️ Laura #10</strong><p>Nivel 1-2 Rookie · 3-5 Street Player · 6-9 Pro · 10-14 MVP · 15+ Legend</p><span class="tag">XP 0 / 100</span></div><div class="card"><strong>Profil jucător</strong><p>Gen: Fată<br>Nume: Laura<br>Număr tricou: 10</p></div></div></div>
-      <div class="grid kpis"><div class="kpi"><span>Nivel</span><b>1</b></div><div class="kpi"><span>Bani</span><b>150</b></div><div class="kpi"><span>Fani</span><b>0</b></div><div class="kpi"><span>Best</span><b id="kBest">0</b></div><div class="kpi"><span>Perfecte</span><b id="kPerfect">0</b></div><div class="kpi"><span>Inel</span><b>0</b></div><div class="kpi"><span>Bank</span><b id="kBank">0</b></div><div class="kpi"><span>Combo max</span><b id="kCombo">0</b></div></div>
-      <div class="section"><h3>Realizări</h3><div class="grid"><div class="card"><strong>🏀 First Bucket</strong><p>Marchează primul coș.</p><span class="tag">Locked</span></div><div class="card"><strong>🔥 On Fire</strong><p>Fă combo x5.</p><span class="tag">Locked</span></div><div class="card"><strong>🏦 Bank Artist</strong><p>10 bank shots total.</p><span class="tag">Locked</span></div><div class="card"><strong>👑 AI Crusher</strong><p>Câștigă pe Pro.</p><span class="tag">Locked</span></div></div></div>
-      <div class="section"><h3>Settings</h3><div class="grid"><div class="card"><strong>Sunet</strong><span class="tag">ON</span></div><div class="card"><strong>Vibrație</strong><span class="tag">ON</span></div><div class="card"><strong>Efecte</strong><span class="tag">HIGH</span></div><div class="card"><strong>Limbă</strong><span class="tag">RO</span></div></div><button class="danger" id="reset">RESET PROGRES</button></div>
-    </section>
-
-    <section class="panel" id="shop"><div class="section"><h3>Shop real — upgrade-uri cumpărabile</h3><div class="grid" id="shopGrid"></div></div></section>
-    <section class="panel" id="leader"><div class="section"><h3>Clasament</h3><ol class="leader"><li><strong>Laura League</strong><span>12</span></li><li><strong>Rookie Bot</strong><span>10</span></li><li><strong>Sniper AI</strong><span>8</span></li><li><strong>Bank Boss</strong><span>6</span></li></ol></div></section>
-    <section class="panel" id="comp"><div class="section"><h3>Daily Missions</h3><div class="grid"><div class="mission">⬜ Marchează 3 bank shots <span class="tag">0/3 · +90 bani</span><div class="bar"><i></i></div></div><div class="mission">⬜ Câștigă un meci pe Greu <span class="tag">0/1 · +120 bani</span><div class="bar"><i></i></div></div><div class="mission">⬜ Fă combo x5 <span class="tag">0/5 · +110 bani</span><div class="bar"><i></i></div></div></div></div><div class="section"><h3>Turneu</h3><div class="grid"><div class="card"><strong>▶ Runda 1 — Rookie Bot</strong><p>Curentă</p></div><div class="card"><strong>🔒 Runda 2 — Sniper AI</strong><p>Blocată</p></div><div class="card"><strong>🔒 Finală — Legend AI</strong><p>Blocată</p></div></div></div><div class="section"><h3>Practice Goals</h3><div class="grid"><div class="card"><strong>⬜ 3 perfect shots</strong><p>Recompensă: +25 XP</p></div><div class="card"><strong>⬜ 2 bank shots</strong><p>Învață ricoșeul din panou.</p></div><div class="card"><strong>⬜ Combo x3</strong><p>Ține seria de coșuri.</p></div></div></div><div class="section"><h3>Boss Rush</h3><p>Rookie Bot → Sniper AI → Bank Boss → Legend AI</p><button class="primary" id="bossBtn">Joacă următorul meci</button></div></section>
+  <aside class="hub" id="hub"><div class="hubHead"><h2>Hub jucător</h2><button class="ghost" id="closeHub">✕</button></div><nav class="tabs"><button class="tab active" data-tab="career">Carieră</button><button class="tab" data-tab="shop">Shop</button><button class="tab" data-tab="leader">Clasament</button><button class="tab" data-tab="comp">Competiții</button></nav>
+    <section class="panel active" id="career"><div class="section"><h3>Identitate</h3><div class="grid"><div class="card"><strong>⛹️‍♀️ Laura #10</strong><p>Nivel 1-2 Rookie · 3-5 Street Player · 6-9 Pro · 10-14 MVP · 15+ Legend</p><span class="tag">XP 0 / 100</span></div><div class="card"><strong>Profil jucător</strong><p>Gen: Fată<br>Nume: Laura<br>Număr tricou: 10</p></div></div></div><div class="grid kpis"><div class="kpi"><span>Nivel</span><b>1</b></div><div class="kpi"><span>Bani</span><b>150</b></div><div class="kpi"><span>Fani</span><b>0</b></div><div class="kpi"><span>Best</span><b id="kBest">0</b></div><div class="kpi"><span>Perfecte</span><b id="kPerfect">0</b></div><div class="kpi"><span>Inel</span><b>0</b></div><div class="kpi"><span>Bank</span><b id="kBank">0</b></div><div class="kpi"><span>Combo max</span><b id="kCombo">0</b></div></div><div class="section"><h3>Realizări</h3><div class="grid"><div class="card"><strong>🏀 First Bucket</strong><p>Marchează primul coș.</p><span class="tag">Locked</span></div><div class="card"><strong>🔥 On Fire</strong><p>Fă combo x5.</p><span class="tag">Locked</span></div><div class="card"><strong>🏦 Bank Artist</strong><p>10 bank shots total.</p><span class="tag">Locked</span></div><div class="card"><strong>👑 AI Crusher</strong><p>Câștigă pe Pro.</p><span class="tag">Locked</span></div></div></div><div class="section"><h3>Settings</h3><div class="grid"><div class="card"><strong>Sunet</strong><span class="tag">ON</span></div><div class="card"><strong>Vibrație</strong><span class="tag">ON</span></div><div class="card"><strong>Efecte</strong><span class="tag">HIGH</span></div><div class="card"><strong>Limbă</strong><span class="tag">RO</span></div></div><button class="danger" id="reset">RESET PROGRES</button></div></section>
+    <section class="panel" id="shop"><div class="section"><h3>Shop real — upgrade-uri cumpărabile</h3><div class="grid" id="shopGrid"></div></div></section><section class="panel" id="leader"><div class="section"><h3>Clasament</h3><ol class="leader"><li><strong>Laura League</strong><span>12</span></li><li><strong>Rookie Bot</strong><span>10</span></li><li><strong>Sniper AI</strong><span>8</span></li><li><strong>Bank Boss</strong><span>6</span></li></ol></div></section><section class="panel" id="comp"><div class="section"><h3>Daily Missions</h3><div class="grid"><div class="mission">⬜ Marchează 3 bank shots <span class="tag">0/3 · +90 bani</span><div class="bar"><i></i></div></div><div class="mission">⬜ Câștigă un meci pe Greu <span class="tag">0/1 · +120 bani</span><div class="bar"><i></i></div></div><div class="mission">⬜ Fă combo x5 <span class="tag">0/5 · +110 bani</span><div class="bar"><i></i></div></div></div></div><div class="section"><h3>Turneu</h3><div class="grid"><div class="card"><strong>▶ Runda 1 — Rookie Bot</strong><p>Curentă</p></div><div class="card"><strong>🔒 Runda 2 — Sniper AI</strong><p>Blocată</p></div><div class="card"><strong>🔒 Finală — Legend AI</strong><p>Blocată</p></div></div></div><div class="section"><h3>Practice Goals</h3><div class="grid"><div class="card"><strong>⬜ 3 perfect shots</strong><p>Recompensă: +25 XP</p></div><div class="card"><strong>⬜ 2 bank shots</strong><p>Învață ricoșeul din panou.</p></div><div class="card"><strong>⬜ Combo x3</strong><p>Ține seria de coșuri.</p></div></div></div><div class="section"><h3>Boss Rush</h3><p>Rookie Bot → Sniper AI → Bank Boss → Legend AI</p><button class="primary" id="bossBtn">Joacă următorul meci</button></div></section>
   </aside>
 
   <div class="end" id="end"><h2 id="endTitle">Victorie!</h2><p id="endText"></p><div class="actions"><button class="primary" id="again">Joacă din nou</button><button id="next">Următorul adversar</button><button class="ghost" id="endHub">Hub</button></div></div>
-  <p class="note"><b>Zero rebuild:</b> pagina încarcă doar <code>zero.css</code>, <code>zero.js</code> și <code>hub-boost.js</code>. Hub-ul are conținut extins.</p>
-  <script src="zero.js?v=zero-hubfix-2" defer></script>
-  <script src="hub-boost.js?v=boost-1" defer></script>
+  <p class="note"><b>Basket vs AI — Stable v1</b></p>
+  <script src="zero.js?v=stable-v1" defer></script>
+  <script src="hub-boost.js?v=stable-v1" defer></script>
+  <script src="stable-cleanup.js?v=stable-v1" defer></script>
 </body>
 </html>
